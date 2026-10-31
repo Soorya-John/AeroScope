@@ -1,0 +1,7 @@
+{
+  "name": "aeroscope-workflow-tests",
+  "private": true,
+  "scripts": {"test:browser": "playwright test"},
+  "dependencies": {"leaflet": "1.9.4"},
+  "devDependencies": {"@playwright/test": "1.56.1"}
+}
