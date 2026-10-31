@@ -51,15 +51,18 @@ class ParameterStore:
         self._lock=threading.RLock(); self._session: str|None=None; self._items: dict[str,dict[str,Any]]={}
         self._count: int|None=None; self._started: float|None=None; self._pending: dict[str,Any]={}; self._error: str|None=None
         self._indices: dict[int,str]={}; self._last_recovery=0.0; self._recovery_round=0
+        self.generation=0
 
     def begin_session(self, session: str) -> None:
         with self._lock: self._session=session; self._items={}; self._count=None; self._started=None; self._pending={}; self._error=None; self._indices={}
 
     def request_all(self) -> None:
+        self.generation+=1
         with self._lock: self._items={}; self._count=None; self._started=time.monotonic(); self._error=None; self._indices={}; self._last_recovery=self._started; self._recovery_round=0
 
     def cancel(self, reason="Cancelled by operator"):
         with self._lock:
+            self.generation+=1
             self._error=reason; self._started=None
             for pending in self._pending.values():
                 if pending['state'] in {'PENDING','IN_PROGRESS'}: pending.update(state='UNKNOWN',detail=reason)
@@ -77,6 +80,8 @@ class ParameterStore:
         with self._lock: self._pending[name]={"state":"PENDING","started":time.monotonic(),"protocol":protocol}
 
     def pending_set(self, name: str, value: Any, protocol: str = "param", param_type: int | None = None) -> None:
+        with self._lock:
+            if self._pending.get(name,{}).get('state') in {'PENDING','IN_PROGRESS'}: raise RuntimeError('A parameter operation is already pending for '+name)
         with self._lock: self._pending[name]={"state":"PENDING","requested_value":value,"requested_type":param_type,
             "protocol":protocol,"requires_ack":protocol=="param_ext","started":time.monotonic()}
 

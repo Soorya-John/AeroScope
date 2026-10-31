@@ -19,6 +19,18 @@ from .missions import MissionManager, validate_mission
 from .firmware import parameter_encoding, encode_parameter, decode_parameter
 from .workflows import Workflows
 
+class OperationQueue(Queue):
+    """Tag mutable protocol operations so cancellation invalidates queued writes."""
+    def __init__(self, manager): super().__init__(maxsize=1024); self.manager=manager
+    def put(self, item, block=True, timeout=None):
+        session,payload=item
+        if isinstance(payload,dict):
+            payload=dict(payload); kind=payload.get('kind','')
+            if kind.startswith('param_'): payload['_generation']=self.manager.parameters.generation
+            if kind.startswith('mission_'): payload['_operation']=self.manager.missions.snapshot()['mission_id']
+        # Never stall the authoritative reader on an exhausted write queue.
+        return super().put((session,payload),block=False)
+
 
 def validate_connection(config: dict[str, Any]) -> tuple[str, str]:
     kind = config.get("kind")
@@ -68,7 +80,7 @@ class MavlinkManager:
         self.transactions = TransactionManager()
         self._session_id: str | None = None
         self._write_lock = threading.Lock()
-        self._outbound: Queue[tuple[str, Any]] = Queue(maxsize=1024)
+        self._outbound: Queue[tuple[str, Any]] = OperationQueue(self)
         self._writer_stop = threading.Event()
         self._writer_thread: threading.Thread | None = None
         self._capabilities: dict[str, Any] = {"available": False, "modes": [], "reason": "No identified vehicle"}
@@ -180,6 +192,7 @@ class MavlinkManager:
                 self.state.reset()
                 first_deadline = time.monotonic() + 15
                 seen_heartbeat = False
+                next_gcs_heartbeat=0.0
                 target_system: int | None = None
                 while not self._stop.is_set():
                     with self._write_lock:
@@ -296,6 +309,9 @@ class MavlinkManager:
                             self._arm_request["state"] = "UNKNOWN"
                             self._arm_request["detail"] = "Armed state was not confirmed by heartbeat"
                     self.events.evaluate(self.state.snapshot())
+                    if seen_heartbeat and time.monotonic()>=next_gcs_heartbeat:
+                        self._outbound.put_nowait((self._session_id,{'kind':'gcs_heartbeat'}))
+                        next_gcs_heartbeat=time.monotonic()+1
                     if not seen_heartbeat and time.monotonic() >= first_deadline:
                         raise TimeoutError("No MAVLink heartbeat received within 15 seconds")
                     hb = self.state.last_heartbeat_monotonic
@@ -343,7 +359,7 @@ class MavlinkManager:
             self.state.set_connection("disconnected", "Disconnected")
 
     def queue_command(self, command: int, parameters: tuple[float, ...], *,
-                      timeout: float = 5.0, safe_retry: bool = False) -> dict[str, Any]:
+                      timeout: float = 5.0, safe_retry: bool = False, frame: int | None = None) -> dict[str, Any]:
         """Queue a COMMAND_LONG on the active live session; never blocks the reader for ACK."""
         snap = self.state.snapshot()
         with self._lock:
@@ -362,7 +378,7 @@ class MavlinkManager:
             if self._session_id != session:
                 self.transactions.cancel_session(session, "Connection session changed")
                 raise RuntimeError("Connection session changed")
-        self._outbound.put((session, (transaction.id, command, tuple(parameters), sysid, compid)))
+        self._outbound.put((session, (transaction.id, command, tuple(parameters), sysid, compid) if frame is None else {'kind':'command_int','transaction_id':transaction.id,'command':command,'params':tuple(parameters),'system':sysid,'component':compid,'frame':frame}))
         return transaction.public()
 
     def capabilities(self) -> dict[str, Any]:
@@ -402,6 +418,8 @@ class MavlinkManager:
                 self._capabilities["version_request_state"]="QUEUED"
                 self._capabilities["version_request_transaction_id"]=transaction["id"]
                 self._capabilities["version_request_message_id"]=148
+        if self.state.snapshot()['vehicle']['autopilot'].get('value')=='ArduPilot':
+            self._outbound.put((session,{'kind':'stream_rates'}))
         return transaction
 
     def _mission_integer_protocol(self) -> bool | None:
@@ -493,6 +511,8 @@ class MavlinkManager:
         extended=param_type in {7,8,10,11}
         if extended: raise ValueError("PARAM_EXT is not qualified for this firmware; write unavailable")
         converted=validate_ext_parameter_value(value,param_type) if extended else validate_parameter_value(value,param_type)
+        from .metadata import parameter_metadata, validate_metadata
+        validate_metadata(converted,parameter_metadata(self.state.snapshot()['vehicle']).get(name,{}))
         wire=encode_parameter(converted,param_type,self._parameter_encoding())
         sensitive=any(x in name.upper() for x in ("FAIL", "ARM", "BATT", "GPS", "EKF", "RC", "MOT", "NAV", "WPNAV", "ATC_"))
         if sensitive and confirmed is not True: raise ValueError("This safety-related parameter requires explicit confirmation")
@@ -584,7 +604,8 @@ class MavlinkManager:
         missing=[name for name,item in (("GPS fix",gps),("battery voltage",snap["battery"]["voltage_v"]),("estimator health",snap["status"]["estimator"])) if not item.get("available")]
         if missing and not acknowledge_unknown: raise ValueError("Safety data unavailable: "+", ".join(missing)+"; explicitly acknowledge unknowns")
         # MAV_CMD_DO_REPOSITION (192), only in explicitly supported ArduPilot GUIDED modes.
-        return self.queue_command(192,(speed,0.0,0.0,0.0,lat,lon,alt),timeout=8)
+        self.workflows.copter()
+        return self.queue_command(192,(speed,0.0,0.0,0.0,lat,lon,alt),timeout=8,frame=6)
 
     def guided_takeoff(self, altitude: float, *, confirmation: str = "", acknowledge_unknown: bool = False) -> dict[str,Any]:
         snap=self.state.snapshot()
@@ -663,7 +684,20 @@ class MavlinkManager:
                     with self._write_lock:
                         connection.set_mode(payload["mode"])
                     continue
+                if isinstance(payload,dict) and payload.get('kind') in {'gcs_heartbeat','stream_rates'}:
+                    with self._write_lock:
+                        if payload['kind']=='gcs_heartbeat': connection.mav.heartbeat_send(6,8,0,0,4,3)
+                        else: connection.mav.request_data_stream_send(int(system),int(self.state.snapshot()['vehicle']['component_id']['value']),0,4,1)
+                    continue
+                if isinstance(payload,dict) and payload.get('kind')=='command_int':
+                    txid=payload['transaction_id']; params=payload['params']
+                    self.transactions.mark_sent(txid)
+                    with self._write_lock:
+                        if self._session_id!=session or self._connection is not connection: continue
+                        connection.mav.command_int_send(payload['system'],payload['component'],payload['frame'],payload['command'],0,0,*params[:4],round(params[4]*1e7),round(params[5]*1e7),params[6])
+                    continue
                 if isinstance(payload, dict) and payload.get("kind", "").startswith("param_"):
+                    if payload.get('_generation')!=self.parameters.generation: continue
                     system_field=self.state.snapshot()["vehicle"].get("system_id"); component_field=self.state.snapshot()["vehicle"].get("component_id")
                     sysid=system_field.get("value") if isinstance(system_field,dict) else system_field
                     compid=component_field.get("value") if isinstance(component_field,dict) else component_field
@@ -679,6 +713,8 @@ class MavlinkManager:
                             connection.mav.param_ext_set_send(sysid,compid,payload["name"].encode().ljust(16,b"\0"),value.ljust(128,b"\0"),payload["type"])
                     continue
                 if isinstance(payload, dict) and payload.get("kind", "").startswith("mission_"):
+                    mission=self.missions.snapshot()
+                    if payload.get('_operation')!=mission['mission_id'] or mission['state']=='CANCELLED': continue
                     sf=self.state.snapshot()["vehicle"]; sysf=sf.get("system_id"); cpf=sf.get("component_id")
                     sysid=sysf.get("value") if isinstance(sysf,dict) else sysf; compid=cpf.get("value") if isinstance(cpf,dict) else cpf
                     if not sysid or not compid: raise RuntimeError("Vehicle target identity unavailable")
@@ -708,6 +744,7 @@ class MavlinkManager:
                 # after bytes reach the transport, before send() returns.
                 self.transactions.mark_sent(txid)
                 with self._write_lock:
+                    if self._session_id!=session or self._connection is not connection: continue
                     connection.mav.command_long_send(sysid, compid, command, 0, *params)
             except Exception as exc:
                 if txid is not None:

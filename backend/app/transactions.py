@@ -59,6 +59,8 @@ class TransactionManager:
         if not 0 < timeout <= 120: raise ValueError("timeout must be between 0 and 120 seconds")
         with self._lock:
             if not self._session: raise RuntimeError("No active MAVLink session")
+            if any(t.session_id==self._session and t.command==command and t.state=='UNKNOWN' for t in self._items.values()):
+                raise RuntimeError('Previous command outcome is unknown; reconnect and inspect vehicle before repeating this command')
             # ACK has no transaction token: never permit ambiguous same-command concurrency.
             if any(t.session_id == self._session and t.command == command and t.state not in TERMINAL
                    for t in self._items.values()):

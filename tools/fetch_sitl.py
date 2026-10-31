@@ -18,3 +18,10 @@ for folder in ('CopterStable/',):
                 print('Downloading', folder + name, flush=True)
                 target.write_bytes(urlopen('https://firmware.ardupilot.org' + link, timeout=60).read())
 print('SITL files:', ', '.join(p.name for p in root.iterdir()))
+commit = re.search(r'commit ([0-9a-f]+)',(root/'git.txt').read_text()).group(1)
+for name in ('copter.parm','copter-quad.parm'):
+    url=f'https://raw.githubusercontent.com/ArduPilot/ardupilot/{commit}/Tools/autotest/default_params/{name}'
+    try:
+        (root/name).write_bytes(urlopen(url,timeout=30).read())
+        print('Default parameters:',name)
+    except Exception as exc: print('Default fetch failed:',name,str(exc))

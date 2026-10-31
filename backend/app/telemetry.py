@@ -204,8 +204,9 @@ class TelemetryNormalizer:
             self._put("vehicle", "firmware", packed, None, stamp, packed is not None)
             def version_text(name: str) -> str | None:
                 value=_field(msg,name,b"")
+                if isinstance(value,(list,tuple)): value=bytes(value)
                 if isinstance(value,bytes):
-                    raw=value.split(b"\0",1)[0]
+                    raw=value
                     return raw.hex() if raw and any(raw) else None
                 return None
             capabilities=int(_field(msg,"capabilities",0))

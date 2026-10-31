@@ -2,6 +2,7 @@
 from collections import deque
 import threading, time, uuid, math
 from .parameters import validate_parameter_value
+from .metadata import parameter_metadata, validate_metadata
 
 GROUPS = {
  'Sensors / orientation':['AHRS_ORIENTATION','COMPASS_USE','INS_GYRO_FILTER'],
@@ -12,7 +13,7 @@ GROUPS = {
  'Failsafes':['FS_THR_ENABLE','FS_THR_VALUE','FS_GCS_ENABLE','FS_EKF_ACTION','RTL_ALT'],
  'Geofence':['FENCE_ENABLE','FENCE_TYPE','FENCE_ALT_MAX','FENCE_RADIUS','FENCE_MARGIN','FENCE_ACTION'],
  'Outputs':['SERVO1_FUNCTION','SERVO2_FUNCTION','SERVO3_FUNCTION','SERVO4_FUNCTION','MOT_PWM_TYPE','MOT_SPIN_ARM','MOT_SPIN_MIN'],
- 'Tuning':['ATC_RAT_RLL_P','ATC_RAT_RLL_I','ATC_RAT_RLL_D','ATC_RAT_PIT_P','ATC_RAT_PIT_I','ATC_RAT_PIT_D','WPNAV_SPEED','WPNAV_ACCEL']}
+ 'Tuning':['ATC_RAT_RLL_P','ATC_RAT_RLL_I','ATC_RAT_RLL_D','ATC_RAT_PIT_P','ATC_RAT_PIT_I','ATC_RAT_PIT_D','WPNAV_SPEED','WPNAV_ACCEL','WP_SPD','WP_ACCEL']}
 
 GET_ROUTES={'/api/setup','/api/control/ownership','/api/parameters/batch','/api/connection/ports'}
 POST_ROUTES={'/api/control/claim','/api/control/release','/api/parameters/stage','/api/parameters/apply','/api/parameters/cancel','/api/mission/cancel','/api/setup/calibrate','/api/setup/position','/api/setup/cancel-calibration','/api/setup/motor-test','/api/maintenance/reboot'}
@@ -53,6 +54,8 @@ class Workflows:
 
     def setup(self):
         s=self.m.state.snapshot(); p=self.m.parameters.snapshot(); values={x['name']:x for x in p['parameters']}
+        metadata=parameter_metadata(s['vehicle'])
+        for name,value in values.items(): value['metadata']=metadata.get(name,{})
         copter=s['vehicle']['autopilot'].get('value')=='ArduPilot' and s['vehicle']['type'].get('value') in {'Quadrotor','Hexarotor','Octorotor','Tricopter','Coaxial','Helicopter'}
         checks=[{'label':'Fresh heartbeat','ok':s['connection']['state']=='connected' and (s['connection'].get('heartbeat_age_s') or 99)<2},
                 {'label':'Supported Copter identity','ok':copter}, {'label':'Complete parameter download','ok':p['progress']['complete']},
@@ -74,6 +77,7 @@ class Workflows:
             seen.add(name)
             if name not in current: raise ValueError('Parameter missing from current vehicle: '+name)
             p=current[name]; value=validate_parameter_value(edit.get('value'),int(p['type']))
+            validate_metadata(value,parameter_metadata(self.m.state.snapshot()['vehicle']).get(name,{}))
             if 'before' in edit and edit['before']!=p['value']: raise ValueError('Vehicle value changed; review '+name)
             if int(p['type']) in {7,8,10,11}: raise ValueError('Extended parameter adapter unavailable: '+name)
             if value!=p['value']: rows.append({'name':name,'before':p['value'],'after':value,'type':p['type'],'state':'STAGED'})

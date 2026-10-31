@@ -1,0 +1,2143 @@
+{
+  "firmware": "4.7.2.255",
+  "commit": "fbd0a3160c90a557c24ce4c38c16975532652536",
+  "license": "GPL-3.0-or-later",
+  "parameters": {
+    "FORMAT_VERSION": {
+      "description": "This value is incremented when changes are made to the eeprom format",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "PILOT_THR_FILT": {
+      "description": "Throttle filter cutoff (Hz) - active whenever altitude control is inactive - 0 to disable",
+      "units": "Hz",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        10.0
+      ]
+    },
+    "PILOT_THR_BHV": {
+      "description": "Bitmask containing various throttle stick options. TX with sprung throttle can set PILOT_THR_BHV to \"1\" so motor feedback when landed starts from mid-stick instead of bottom of stick.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "GCS_PID_MASK": {
+      "description": "bitmask of PIDs to send MAVLink PID_TUNING messages for",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "RTL_CONE_SLOPE": {
+      "description": "Defines a cone above home which determines maximum climb",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        10.0
+      ],
+      "enum": {
+        "0": "Disabled",
+        "1": "Shallow",
+        "3": "Steep"
+      }
+    },
+    "RTL_LOIT_TIME": {
+      "description": "Time (in milliseconds) to loiter above home before beginning final descent",
+      "units": "ms",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        60000.0
+      ]
+    },
+    "RTL_ALT_TYPE": {
+      "description": "RTL altitude type.  Set to 1 for Terrain following during RTL and then set WP_RFND_USE=1 to use rangefinder or WP_RFND_USE=0 to use Terrain database",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Relative to Home",
+        "1": "Terrain"
+      }
+    },
+    "FS_GCS_ENABLE": {
+      "description": "Controls whether failsafe will be invoked (and what action to take) when connection with Ground station is lost for at least 5 seconds. See FS_OPTIONS param for additional actions, or for cases allowing Mission continuation, when GCS failsafe is enabled.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Disabled/NoAction",
+        "1": "RTL",
+        "2": "RTL or Continue with Mission in Auto Mode (Removed in 4.0+-see FS_OPTIONS)",
+        "3": "SmartRTL or RTL",
+        "4": "SmartRTL or Land",
+        "5": "Land",
+        "6": "Auto DO_LAND_START/DO_RETURN_PATH_START or RTL",
+        "7": "Brake or Land"
+      }
+    },
+    "GPS_HDOP_GOOD": {
+      "description": "GPS Hdop value at or below this value represent a good position.  Used for pre-arm checks",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        100.0,
+        900.0
+      ]
+    },
+    "SUPER_SIMPLE": {
+      "description": "Bitmask to enable Super Simple mode for some flight modes. Setting this to Disabled(0) will disable Super Simple Mode. The bitmask is for flight mode switch positions",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "WP_YAW_BEHAVIOR": {
+      "description": "Determines how the autopilot controls the yaw during missions and RTL",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Never change yaw",
+        "1": "Face next waypoint",
+        "2": "Face next waypoint except RTL",
+        "3": "Face along GPS course"
+      }
+    },
+    "FS_THR_ENABLE": {
+      "description": "The throttle failsafe allows you to configure a software failsafe activated by a setting on the throttle input channel",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Disabled",
+        "1": "Enabled always RTL",
+        "2": "Enabled Continue with Mission in Auto Mode (Removed in 4.0+)",
+        "3": "Enabled always Land",
+        "4": "Enabled always SmartRTL or RTL",
+        "5": "Enabled always SmartRTL or Land",
+        "6": "Enabled Auto DO_LAND_START/DO_RETURN_PATH_START or RTL",
+        "7": "Enabled always Brake or Land"
+      }
+    },
+    "FS_THR_VALUE": {
+      "description": "The PWM level in microseconds on channel 3 below which throttle failsafe triggers",
+      "units": "PWM",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        910.0,
+        1100.0
+      ]
+    },
+    "THR_DZ": {
+      "description": "The deadzone above and below mid throttle in PWM microseconds. Used in AltHold, Loiter, PosHold flight modes",
+      "units": "PWM",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        300.0
+      ]
+    },
+    "FLTMODE1": {
+      "description": "Flight mode when pwm of Flightmode channel(FLTMODE_CH) is <= 1230",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Stabilize",
+        "1": "Acro",
+        "2": "AltHold",
+        "3": "Auto",
+        "4": "Guided",
+        "5": "Loiter",
+        "6": "RTL",
+        "7": "Circle",
+        "9": "Land",
+        "11": "Drift",
+        "13": "Sport",
+        "14": "Flip",
+        "15": "AutoTune",
+        "16": "PosHold",
+        "17": "Brake",
+        "18": "Throw",
+        "19": "Avoid_ADSB",
+        "20": "Guided_NoGPS",
+        "21": "Smart_RTL",
+        "22": "FlowHold",
+        "23": "Follow",
+        "24": "ZigZag",
+        "25": "SystemID",
+        "26": "Heli_Autorotate",
+        "27": "Auto RTL",
+        "28": "Turtle"
+      }
+    },
+    "FLTMODE2": {
+      "description": "Flight mode when pwm of Flightmode channel(FLTMODE_CH) is >1230, <= 1360",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "FLTMODE3": {
+      "description": "Flight mode when pwm of Flightmode channel(FLTMODE_CH) is >1360, <= 1490",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "FLTMODE4": {
+      "description": "Flight mode when pwm of Flightmode channel(FLTMODE_CH) is >1490, <= 1620",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "FLTMODE5": {
+      "description": "Flight mode when pwm of Flightmode channel(FLTMODE_CH) is >1620, <= 1749",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "FLTMODE6": {
+      "description": "Flight mode when pwm of Flightmode channel(FLTMODE_CH) is >=1750",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "FLTMODE_CH": {
+      "description": "RC Channel to use for flight mode control",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Disabled",
+        "5": "Channel5",
+        "6": "Channel6",
+        "7": "Channel7",
+        "8": "Channel8",
+        "9": "Channel9",
+        "10": "Channel 10",
+        "11": "Channel 11",
+        "12": "Channel 12",
+        "13": "Channel 13",
+        "14": "Channel 14",
+        "15": "Channel 15"
+      }
+    },
+    "INITIAL_MODE": {
+      "description": "This selects the mode to start in on boot. This is useful for when you want to start in AUTO mode on boot without a receiver.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Stabilize",
+        "1": "Acro",
+        "2": "AltHold",
+        "3": "Auto",
+        "4": "Guided",
+        "5": "Loiter",
+        "6": "RTL",
+        "7": "Circle",
+        "9": "Land",
+        "11": "Drift",
+        "13": "Sport",
+        "14": "Flip",
+        "15": "AutoTune",
+        "16": "PosHold",
+        "17": "Brake",
+        "18": "Throw",
+        "19": "Avoid_ADSB",
+        "20": "Guided_NoGPS",
+        "21": "Smart_RTL",
+        "22": "FlowHold",
+        "23": "Follow",
+        "24": "ZigZag",
+        "25": "SystemID",
+        "26": "Heli_Autorotate"
+      }
+    },
+    "SIMPLE": {
+      "description": "Bitmask which holds which flight modes use simple heading mode (eg bit 0 = 1 means Flight Mode 0 uses simple mode). The bitmask is for flightmode switch positions.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "LOG_BITMASK": {
+      "description": "Bitmap of what on-board log types to enable. This value is made up of the sum of each of the log types you want to be saved. It is usually best just to enable all basiclog types by setting this to 65535. Note that if you want to reduce log sizes you should consider using LOG_FILE_RATEMAX instead of disabling logging items with this parameter.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "ESC_CALIBRATION": {
+      "description": "Controls whether ArduCopter will enter ESC calibration on the next restart.  Do not adjust this parameter manually.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Normal Start-up",
+        "1": "Start-up in ESC Calibration mode if throttle high",
+        "2": "Start-up in ESC Calibration mode regardless of throttle",
+        "3": "Start-up and automatically calibrate ESCs",
+        "9": "Disabled"
+      }
+    },
+    "TUNE": {
+      "description": "Selects parameter (normally a PID gain) that is being tuned with an RC transmitter's knob. The RC input channel used is assigned by setting RCx_OPTION to 219.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "None",
+        "1": "Stab Roll/Pitch kP",
+        "4": "Rate Roll/Pitch kP",
+        "5": "Rate Roll/Pitch kI",
+        "21": "Rate Roll/Pitch kD",
+        "3": "Stab Yaw kP",
+        "6": "Rate Yaw kP",
+        "26": "Rate Yaw kD",
+        "56": "Rate Yaw Filter",
+        "55": "Motor Yaw Headroom",
+        "14": "AltHold kP",
+        "7": "Throttle Rate kP",
+        "34": "Throttle Accel kP",
+        "35": "Throttle Accel kI",
+        "36": "Throttle Accel kD",
+        "12": "Loiter Pos kP",
+        "22": "Velocity XY kP",
+        "28": "Velocity XY kI",
+        "10": "WP Speed",
+        "25": "Acro Roll/Pitch deg/s",
+        "40": "Acro Yaw deg/s",
+        "45": "RC Feel",
+        "13": "Heli Ext Gyro",
+        "38": "Declination",
+        "39": "Circle Rate",
+        "46": "Rate Pitch kP",
+        "47": "Rate Pitch kI",
+        "48": "Rate Pitch kD",
+        "49": "Rate Roll kP",
+        "50": "Rate Roll kI",
+        "51": "Rate Roll kD",
+        "52": "Rate Pitch FF",
+        "53": "Rate Roll FF",
+        "54": "Rate Yaw FF",
+        "58": "SysID Magnitude",
+        "59": "PSC Angle Max",
+        "60": "Loiter Speed"
+      }
+    },
+    "FRAME_TYPE": {
+      "description": "Controls motor mixing for multicopters.  Not used for Tri or Traditional Helicopters.",
+      "units": "",
+      "reboot": true,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Plus",
+        "1": "X",
+        "2": "V",
+        "3": "H",
+        "4": "V-Tail",
+        "5": "A-Tail",
+        "10": "Y6B",
+        "11": "Y6F",
+        "12": "BetaFlightX",
+        "13": "DJIX",
+        "14": "ClockwiseX",
+        "15": "I",
+        "18": "BetaFlightXReversed",
+        "19": "Y4"
+      }
+    },
+    "DISARM_DELAY": {
+      "description": "Delay before automatic disarm in seconds after landing touchdown detection. A value of zero disables auto disarm. If Emergency Motor stop active, delay time is half this value.",
+      "units": "s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        127.0
+      ]
+    },
+    "PHLD_BRK_RATE": {
+      "description": "PosHold flight mode's rotation rate during braking in deg/sec",
+      "units": "deg/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        4.0,
+        12.0
+      ]
+    },
+    "LAND_REPOSITION": {
+      "description": "Enables user input during LAND mode, the landing phase of RTL, and auto mode landings.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "No repositioning",
+        "1": "Repositioning"
+      }
+    },
+    "FS_EKF_ACTION": {
+      "description": "Controls the action that will be taken when an EKF failsafe is invoked",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Report only",
+        "1": "Switch to Land mode if current mode requires position",
+        "2": "Switch to AltHold mode if current mode requires position",
+        "3": "Switch to Land mode from all modes"
+      }
+    },
+    "FS_EKF_THRESH": {
+      "description": "Allows setting the maximum acceptable compass, velocity, position and height variances. Used in arming check and EKF failsafe.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        1.0
+      ],
+      "enum": {
+        "0": "Disabled",
+        "0.6": "Strict",
+        "0.8": "Default",
+        "1.0": "Relaxed"
+      }
+    },
+    "FS_CRASH_CHECK": {
+      "description": "This enables automatic crash checking. When enabled the motors will disarm if a crash is detected.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Disabled",
+        "1": "Enabled"
+      }
+    },
+    "RC_SPEED": {
+      "description": "This is the speed in Hertz that your ESCs will receive updates",
+      "units": "Hz",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        50.0,
+        490.0
+      ]
+    },
+    "ACRO_BAL_ROLL": {
+      "description": "rate at which roll angle returns to level in acro and sport mode.  A higher value causes the vehicle to return to level faster. For helicopter sets the decay rate of the virtual flybar in the roll axis. A higher value causes faster decay of desired to actual attitude.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        3.0
+      ]
+    },
+    "ACRO_BAL_PITCH": {
+      "description": "rate at which pitch angle returns to level in acro and sport mode.  A higher value causes the vehicle to return to level faster. For helicopter sets the decay rate of the virtual flybar in the pitch axis. A higher value causes faster decay of desired to actual attitude.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        3.0
+      ]
+    },
+    "ACRO_TRAINER": {
+      "description": "Type of trainer used in acro mode",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Disabled",
+        "1": "Leveling",
+        "2": "Leveling and Limited"
+      }
+    },
+    "THROW_MOT_START": {
+      "description": "Used by Throw mode. Controls whether motors will run at the speed set by MOT_SPIN_MIN or will be stopped when armed and waiting for the throw.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Stopped",
+        "1": "Running"
+      }
+    },
+    "THROW_ALT_MIN": {
+      "description": "Minimum altitude above which Throw mode will detect a throw or a drop - 0 to disable the check",
+      "units": "m",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "THROW_ALT_MAX": {
+      "description": "Maximum altitude under which Throw mode will detect a throw or a drop - 0 to disable the check",
+      "units": "m",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "THROW_ALT_DCSND": {
+      "description": "Target altitude to descend during a drop, (must be positive). This allows for rapidly clearing surrounding obstacles.",
+      "units": "m",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "THROW_ALT_ACSND": {
+      "description": "Target altitude to ascend during a throw upwards (must be positive). This allows for rapidly clearing surrounding obstacles.",
+      "units": "m",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "WP_NAVALT_MIN": {
+      "description": "Altitude in meters above which navigation will begin during auto takeoff",
+      "units": "m",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        5.0
+      ]
+    },
+    "THROW_NEXTMODE": {
+      "description": "Vehicle will switch to this mode after the throw is successfully completed.  Default is to stay in throw mode (18)",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "3": "Auto",
+        "4": "Guided",
+        "5": "LOITER",
+        "6": "RTL",
+        "9": "Land",
+        "17": "Brake",
+        "18": "Throw"
+      }
+    },
+    "THROW_TYPE": {
+      "description": "Used by Throw mode. Specifies whether Copter is thrown upward or dropped.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Upward Throw",
+        "1": "Drop"
+      }
+    },
+    "GND_EFFECT_COMP": {
+      "description": "Ground Effect Compensation Enable/Disable",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Disabled",
+        "1": "Enabled"
+      }
+    },
+    "DEV_OPTIONS": {
+      "description": "Bitmask of developer options. The meanings of the bit fields in this parameter may vary at any time. Developers should check the source code for current meaning",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "ACRO_THR_MID": {
+      "description": "Acro Throttle Mid",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        1.0
+      ]
+    },
+    "FRAME_CLASS": {
+      "description": "Controls major frame class for multicopter component",
+      "units": "",
+      "reboot": true,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Undefined",
+        "1": "Quad",
+        "2": "Hexa",
+        "3": "Octa",
+        "4": "OctaQuad",
+        "5": "Y6",
+        "6": "Heli",
+        "7": "Tri",
+        "8": "SingleCopter",
+        "9": "CoaxCopter",
+        "10": "BiCopter",
+        "11": "Heli_Dual",
+        "12": "DodecaHexa",
+        "13": "HeliQuad",
+        "14": "Deca",
+        "15": "Scripting Matrix",
+        "16": "6DoF Scripting",
+        "17": "Dynamic Scripting Matrix"
+      }
+    },
+    "TUNE_MIN": {
+      "description": "Transmitter Tuning minum value. The parameter being tuned will have its value set to this minimum value when the tuning knob is at its lowest position",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "TUNE_MAX": {
+      "description": "Transmitter Tuning maximum value. The parameter being tuned will have its value set to this maximum value when the tuning knob is at its highest position",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "FS_VIBE_ENABLE": {
+      "description": "This enables the vibration failsafe which will use modified altitude estimation and control during high vibrations",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Disabled",
+        "1": "Enabled"
+      }
+    },
+    "FS_OPTIONS": {
+      "description": "Bitmask of additional options for battery, radio, & GCS failsafes. 0 (default) disables all options.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "ACRO_OPTIONS": {
+      "description": "A range of options that can be applied to change acro mode behaviour. Air-mode enables ATC_THR_MIX_MAN at all times (air-mode has no effect on helicopters). Rate Loop Only disables the use of angle stabilization and uses angular rate stabilization only.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "AUTO_OPTIONS": {
+      "description": "A range of options that can be applied to change auto mode behaviour. Allow Arming allows the copter to be armed in Auto. Allow Takeoff Without Raising Throttle allows takeoff without the pilot having to raise the throttle. Ignore pilot yaw overrides the pilot's yaw stick being used while in auto.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "GUID_OPTIONS": {
+      "description": "Options that can be applied to change guided mode behaviour",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "FS_GCS_TIMEOUT": {
+      "description": "Timeout before triggering the GCS failsafe",
+      "units": "s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        2.0,
+        120.0
+      ]
+    },
+    "RTL_OPTIONS": {
+      "description": "Options that can be applied to change RTL mode behaviour",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "FLIGHT_OPTIONS": {
+      "description": "Flight mode specific options",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "RNGFND_FILT": {
+      "description": "Rangefinder filter to smooth distance.  Set to zero to disable filtering",
+      "units": "Hz",
+      "reboot": true,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        5.0
+      ]
+    },
+    "GUID_TIMEOUT": {
+      "description": "Guided mode timeout after which vehicle will stop or return to level if no updates are received from caller. Only applicable during any combination of velocity, acceleration, angle control, and/or angular rate control",
+      "units": "s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.1,
+        5.0
+      ]
+    },
+    "SURFTRAK_MODE": {
+      "description": "set which surface to track in surface tracking",
+      "units": "",
+      "reboot": true,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Do not track",
+        "1": "Ground",
+        "2": "Ceiling"
+      }
+    },
+    "FS_DR_ENABLE": {
+      "description": "Failsafe action taken immediately as deadreckoning starts. Deadreckoning starts when EKF loses position and velocity source and relies only on wind estimates",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Disabled/NoAction",
+        "1": "Land",
+        "2": "RTL",
+        "3": "SmartRTL or RTL",
+        "4": "SmartRTL or Land",
+        "6": "Auto DO_LAND_START/DO_RETURN_PATH_START or RTL"
+      }
+    },
+    "FS_DR_TIMEOUT": {
+      "description": "DeadReckoning is available for this many seconds after losing position and/or velocity source.  After this timeout elapses the EKF failsafe will trigger in modes requiring a position estimate",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        120.0
+      ]
+    },
+    "ACRO_RP_RATE": {
+      "description": "Acro roll and pitch rate control input time constant.  Low numbers lead to sharper response, higher numbers to softer response",
+      "units": "s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        1.0
+      ],
+      "enum": {
+        "0.5": "Very Soft",
+        "0.2": "Soft",
+        "0.15": "Medium",
+        "0.1": "Crisp",
+        "0.05": "Very Crisp"
+      }
+    },
+    "ACRO_Y_RATE": {
+      "description": "Acro yaw rate control input time constant.  Low numbers lead to sharper response, higher numbers to softer response",
+      "units": "s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        1.0
+      ],
+      "enum": {
+        "0.5": "Very Soft",
+        "0.2": "Soft",
+        "0.15": "Medium",
+        "0.1": "Crisp",
+        "0.05": "Very Crisp"
+      }
+    },
+    "PILOT_Y_RATE": {
+      "description": "Pilot yaw rate control input time constant.  Low numbers lead to sharper response, higher numbers to softer response",
+      "units": "s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        1.0
+      ],
+      "enum": {
+        "0.5": "Very Soft",
+        "0.2": "Soft",
+        "0.15": "Medium",
+        "0.1": "Crisp",
+        "0.05": "Very Crisp"
+      }
+    },
+    "TKOFF_SLEW_TIME": {
+      "description": "Time to slew the throttle from minimum to maximum while checking for a successful takeoff.",
+      "units": "s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.25,
+        5.0
+      ]
+    },
+    "TKOFF_RPM_MIN": {
+      "description": "Takeoff is not permitted until motors report at least this RPM.  Set to zero to disable check",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        10000.0
+      ]
+    },
+    "PLDP_THRESH": {
+      "description": "Ratio of vertical thrust during decent below which payload touchdown will trigger.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.5,
+        0.9
+      ]
+    },
+    "PLDP_RNG_MAX": {
+      "description": "Maximum range finder altitude in m to trigger payload touchdown, set to zero to disable.",
+      "units": "m",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        100.0
+      ]
+    },
+    "PLDP_DELAY": {
+      "description": "Delay after release, in seconds, before aircraft starts to climb back to starting altitude.",
+      "units": "s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        120.0
+      ]
+    },
+    "PLDP_SPEED_DN": {
+      "description": "The maximum vertical decent velocity in m/s. If 0 LAND_SPD_MS value is used.",
+      "units": "m/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        5.0
+      ]
+    },
+    "SURFTRAK_TC": {
+      "description": "Time to achieve 63.2% of the surface altitude measurement change.  If 0 filtering is disabled",
+      "units": "s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        5.0
+      ]
+    },
+    "TKOFF_THR_MAX": {
+      "description": "Takeoff maximum throttle allowed before controllers assume the aircraft is airborne during the takeoff process.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        0.9
+      ]
+    },
+    "TKOFF_RPM_MAX": {
+      "description": "Takeoff is not permitted until motors report no more than this RPM.  Set to zero to disable check",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        10000.0
+      ]
+    },
+    "FS_EKF_FILT": {
+      "description": "EKF Failsafe filter cutoff frequency. EKF variances are filtered using this value to avoid spurious failsafes from transient high variances. A higher value means the failsafe is more likely to trigger.",
+      "units": "Hz",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        10.0
+      ]
+    },
+    "FSTRATE_ENABLE": {
+      "description": "Enable the fast Rate thread. In the default case the fast rate divisor, which controls the update frequency of the thread, is dynamically scaled from FSTRATE_DIV to avoid overrun in the gyro sample buffer and main loop slow-downs. Other values can be selected to fix the divisor to FSTRATE_DIV on arming or always.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "enum": {
+        "0": "Disabled",
+        "1": "Enabled-Dynamic",
+        "2": "Enabled-FixedWhenArmed",
+        "3": "Enabled-Fixed"
+      }
+    },
+    "FSTRATE_DIV": {
+      "description": "Fast rate thread divisor used to control the maximum fast rate update rate. The actual rate is the gyro rate in Hz divided by this value. This value is scaled depending on the configuration of FSTRATE_ENABLE.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        1.0,
+        10.0
+      ]
+    },
+    "TUNE2_MIN": {
+      "description": "Minimum value that the parameter currently being tuned with the transmitter's TRANSMITTER_TUNING2 knob will be set to",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "TUNE2_MAX": {
+      "description": "Maximum value that the parameter currently being tuned with the transmitter's TRANSMITTER2_TUNING knob will be set to",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "TUNE2": {
+      "description": "Selects parameter (normally a PID gain) that is being tuned with an RC transmitter's knob. The RC input channel used is assigned by setting RCx_OPTION to 220.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
+    },
+    "PILOT_ACC_Z": {
+      "description": "The vertical acceleration used when pilot is controlling the altitude",
+      "units": "m/s/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.5,
+        5.0
+      ]
+    },
+    "PILOT_SPD_UP": {
+      "description": "The maximum vertical ascending velocity the pilot may request in m/s",
+      "units": "m/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.5,
+        5.0
+      ]
+    },
+    "PILOT_SPD_DN": {
+      "description": "The maximum vertical descending velocity the pilot may request in m/s.  If 0 PILOT_SPD_UP value is used.",
+      "units": "m/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        5.0
+      ]
+    },
+    "PILOT_TKO_ALT_M": {
+      "description": "Altitude that altitude control modes will climb to when a takeoff is triggered with the throttle stick.",
+      "units": "m",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp",
+      "range": [
+        0.0,
+        10.0
+      ]
+    },
+    "AHRS_GPS_GAIN": {
+      "description": "This controls how much to use the GPS to correct the attitude. This should never be set to zero for a plane as it would result in the plane losing control in turns. For a plane please use the default value of 1.0.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_AHRS/AP_AHRS.cpp",
+      "range": [
+        0.0,
+        1.0
+      ]
+    },
+    "AHRS_GPS_USE": {
+      "description": "This controls whether to use dead-reckoning or GPS based navigation. If set to 0 then the GPS won't be used for navigation, and only dead reckoning will be used. A value of zero should never be used for normal flight. Currently this affects only the DCM-based AHRS: the EKF uses GPS according to its own parameters. A value of 2 means to use GPS for height as well as position - both in DCM estimation and when determining altitude-above-home.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_AHRS/AP_AHRS.cpp",
+      "enum": {
+        "0": "Disabled",
+        "1": "Use GPS for DCM position",
+        "2": "Use GPS for DCM position and height"
+      }
+    },
+    "AHRS_YAW_P": {
+      "description": "This controls the weight the compass or GPS has on the heading. A higher value means the heading will track the yaw source (GPS or compass) more rapidly.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_AHRS/AP_AHRS.cpp",
+      "range": [
+        0.1,
+        0.4
+      ]
+    },
+    "AHRS_RP_P": {
+      "description": "This controls how fast the accelerometers correct the attitude",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_AHRS/AP_AHRS.cpp",
+      "range": [
+        0.1,
+        0.4
+      ]
+    },
+    "AHRS_WIND_MAX": {
+      "description": "This sets the maximum allowable difference between ground speed and airspeed. A value of zero means to use the airspeed as is. This allows the plane to cope with a failing airspeed sensor by clipping it to groundspeed plus/minus this limit. See ARSPD_OPTIONS and ARSPD_WIND_MAX to disable airspeed sensors.",
+      "units": "m/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_AHRS/AP_AHRS.cpp",
+      "range": [
+        0.0,
+        127.0
+      ]
+    },
+    "AHRS_TRIM_X": {
+      "description": "Not Used",
+      "units": "rad",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_AHRS/AP_AHRS.cpp",
+      "range": [
+        -0.1745,
+        0.1745
+      ]
+    },
+    "AHRS_ORIENTATION": {
+      "description": "Overall board orientation relative to the standard orientation for the board type. This rotates the IMU and compass readings to allow the board to be oriented in your vehicle at any 90 or 45 degree angle. The label for each option is specified in the order of rotations for that orientation. This option takes affect on next boot. After changing you will need to re-level your vehicle. Firmware versions 4.2 and prior can use a CUSTOM (100) rotation to set the AHRS_CUSTOM_ROLL/PIT/YAW angles for AHRS orientation. Later versions provide two general custom rotations which can be used, Custom 1 and Custom 2, with CUST_ROT1_ROLL/PIT/YAW or CUST_ROT2_ROLL/PIT/YAW angles.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_AHRS/AP_AHRS.cpp",
+      "enum": {
+        "0": "None",
+        "1": "Yaw45",
+        "2": "Yaw90",
+        "3": "Yaw135",
+        "4": "Yaw180",
+        "5": "Yaw225",
+        "6": "Yaw270",
+        "7": "Yaw315",
+        "8": "Roll180",
+        "9": "Yaw45Roll180",
+        "10": "Yaw90Roll180",
+        "11": "Yaw135Roll180",
+        "12": "Pitch180",
+        "13": "Yaw225Roll180",
+        "14": "Yaw270Roll180",
+        "15": "Yaw315Roll180",
+        "16": "Roll90",
+        "17": "Yaw45Roll90",
+        "18": "Yaw90Roll90",
+        "19": "Yaw135Roll90",
+        "20": "Roll270",
+        "21": "Yaw45Roll270",
+        "22": "Yaw90Roll270",
+        "23": "Yaw135Roll270",
+        "24": "Pitch90",
+        "25": "Pitch270",
+        "26": "Yaw90Pitch180",
+        "27": "Yaw270Pitch180",
+        "28": "Pitch90Roll90",
+        "29": "Pitch90Roll180",
+        "30": "Pitch90Roll270",
+        "31": "Pitch180Roll90",
+        "32": "Pitch180Roll270",
+        "33": "Pitch270Roll90",
+        "34": "Pitch270Roll180",
+        "35": "Pitch270Roll270",
+        "36": "Yaw90Pitch180Roll90",
+        "37": "Yaw270Roll90",
+        "38": "Yaw293Pitch68Roll180",
+        "39": "Pitch315",
+        "40": "Pitch315Roll90",
+        "42": "Roll45",
+        "43": "Roll315",
+        "100": "Custom 4.1 and older",
+        "101": "Custom 1",
+        "102": "Custom 2"
+      }
+    },
+    "AHRS_COMP_BETA": {
+      "description": "This controls the time constant for the cross-over frequency used to fuse AHRS (airspeed and heading) and GPS data to estimate ground velocity. Time constant is 0.1/beta. A larger time constant will use GPS data less and a small time constant will use air data less.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_AHRS/AP_AHRS.cpp",
+      "range": [
+        0.001,
+        0.5
+      ]
+    },
+    "AHRS_GPS_MINSATS": {
+      "description": "Minimum number of satellites visible to use GPS for velocity based corrections attitude correction. This defaults to 6, which is about the point at which the velocity numbers from a GPS become too unreliable for accurate correction of the accelerometers.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_AHRS/AP_AHRS.cpp",
+      "range": [
+        0.0,
+        10.0
+      ]
+    },
+    "AHRS_EKF_TYPE": {
+      "description": "This controls which NavEKF Kalman filter version is used for attitude and position estimation",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_AHRS/AP_AHRS.cpp",
+      "enum": {
+        "0": "Disabled",
+        "2": "Enable EKF2",
+        "3": "Enable EKF3",
+        "10": "Sim",
+        "11": "ExternalAHRS"
+      }
+    },
+    "AHRS_CUSTOM_ROLL": {
+      "description": "This controls optional AHRS behaviour. Setting DisableDCMFallbackFW will change the AHRS behaviour for fixed wing aircraft in fly-forward flight to not fall back to DCM when the EKF stops navigating. Setting DisableDCMFallbackVTOL will change the AHRS behaviour for fixed wing aircraft in non fly-forward (VTOL) flight to not fall back to DCM when the EKF stops navigating. Setting DontDisableAirspeedUsingEKF disables the EKF based innovation check for airspeed consistency. Setting AutoRecordOrigin will auto-save the EKF origin to parameters when it becomes valid.",
+      "units": "deg",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_AHRS/AP_AHRS.cpp",
+      "range": [
+        -180.0,
+        180.0
+      ]
+    },
+    "AHRS_ORIGIN_LAT": {
+      "description": "AHRS last origin latitude in degrees",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_AHRS/AP_AHRS.cpp",
+      "range": [
+        -180.0,
+        180.0
+      ]
+    },
+    "AHRS_ORIGIN_LON": {
+      "description": "AHRS last origin longitude in degrees",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_AHRS/AP_AHRS.cpp",
+      "range": [
+        -180.0,
+        180.0
+      ]
+    },
+    "AHRS_ORIGIN_ALT": {
+      "description": "AHRS last origin altitude in meters",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_AHRS/AP_AHRS.cpp",
+      "range": [
+        -200.0,
+        5000.0
+      ]
+    },
+    "INS__GYROFFS_X": {
+      "description": "Gyro sensor offsets of Z axis. This is setup on each boot during gyro calibrations",
+      "units": "rad/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "INS__GYR2OFFS_X": {
+      "description": "Gyro2 sensor offsets of Z axis. This is setup on each boot during gyro calibrations",
+      "units": "rad/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "INS__GYR3OFFS_X": {
+      "description": "Gyro3 sensor offsets of Z axis. This is setup on each boot during gyro calibrations",
+      "units": "rad/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "INS__ACCSCAL_X": {
+      "description": "Accelerometer scaling of Z axis  Calculated during acceleration calibration routine",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "range": [
+        0.8,
+        1.2
+      ]
+    },
+    "INS__ACCOFFS_X": {
+      "description": "Accelerometer offsets of Z axis. This is setup using the acceleration calibration or level operations",
+      "units": "m/s/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "range": [
+        -3.5,
+        3.5
+      ]
+    },
+    "INS__ACC2SCAL_X": {
+      "description": "Accelerometer2 scaling of Z axis  Calculated during acceleration calibration routine",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "range": [
+        0.8,
+        1.2
+      ]
+    },
+    "INS__ACC2OFFS_X": {
+      "description": "Accelerometer2 offsets of Z axis. This is setup using the acceleration calibration or level operations",
+      "units": "m/s/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "range": [
+        -3.5,
+        3.5
+      ]
+    },
+    "INS__ACC3SCAL_X": {
+      "description": "Accelerometer3 scaling of Z axis  Calculated during acceleration calibration routine",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "range": [
+        0.8,
+        1.2
+      ]
+    },
+    "INS__ACC3OFFS_X": {
+      "description": "Accelerometer3 offsets of Z axis. This is setup using the acceleration calibration or level operations",
+      "units": "m/s/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "range": [
+        -3.5,
+        3.5
+      ]
+    },
+    "INS__GYRO_FILTER": {
+      "description": "Filter cutoff frequency for gyroscopes. This can be set to a lower value to try to cope with very high vibration levels in aircraft. A value of zero means no filtering (not recommended!)",
+      "units": "Hz",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "range": [
+        0.0,
+        256.0
+      ]
+    },
+    "INS__ACCEL_FILTER": {
+      "description": "Filter cutoff frequency for accelerometers. This can be set to a lower value to try to cope with very high vibration levels in aircraft. A value of zero means no filtering (not recommended!)",
+      "units": "Hz",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "range": [
+        0.0,
+        256.0
+      ]
+    },
+    "INS__USE": {
+      "description": "Use first IMU for attitude, velocity and position estimates",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "enum": {
+        "0": "Disabled",
+        "1": "Enabled"
+      }
+    },
+    "INS__USE2": {
+      "description": "Use second IMU for attitude, velocity and position estimates",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "enum": {
+        "0": "Disabled",
+        "1": "Enabled"
+      }
+    },
+    "INS__USE3": {
+      "description": "Use third IMU for attitude, velocity and position estimates",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "enum": {
+        "0": "Disabled",
+        "1": "Enabled"
+      }
+    },
+    "INS__STILL_THRESH": {
+      "description": "Threshold to tolerate vibration to determine if vehicle is motionless. This depends on the frame type and if there is a constant vibration due to motors before launch or after landing. Total motionless is about 0.05. Suggested values: Planes/rover use 0.1, multirotors use 1, tradHeli uses 5",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "range": [
+        0.05,
+        50.0
+      ]
+    },
+    "INS__GYR_CAL": {
+      "description": "Conrols when automatic gyro calibration is performed",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "enum": {
+        "0": "Never",
+        "1": "Start-up only"
+      }
+    },
+    "INS__TRIM_OPTION": {
+      "description": "Specifies how the accel cal routine determines the trims",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "enum": {
+        "0": "Don't adjust the trims",
+        "1": "Assume first orientation was level",
+        "2": "Assume ACC_BODYFIX is perfectly aligned to the vehicle"
+      }
+    },
+    "INS__ACC_BODYFIX": {
+      "description": "The body-fixed accelerometer to be used for trim calculation",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "enum": {
+        "1": "IMU 1",
+        "2": "IMU 2",
+        "3": "IMU 3"
+      }
+    },
+    "INS__POS1_X": {
+      "description": "Z position of the first IMU accelerometer in body frame. Positive Z is down from the origin. Attention: The IMU should be located as close to the vehicle c.g. as practical so that the value of this parameter is minimised. Failure to do so can result in noisy navigation velocity measurements due to vibration and IMU gyro noise. If the IMU cannot be moved and velocity noise is a problem, a location closer to the IMU can be used as the body frame origin.",
+      "units": "m",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "range": [
+        -5.0,
+        5.0
+      ]
+    },
+    "INS__POS2_X": {
+      "description": "Z position of the second IMU accelerometer in body frame. Positive Z is down from the origin. Attention: The IMU should be located as close to the vehicle c.g. as practical so that the value of this parameter is minimised. Failure to do so can result in noisy navigation velocity measurements due to vibration and IMU gyro noise. If the IMU cannot be moved and velocity noise is a problem, a location closer to the IMU can be used as the body frame origin.",
+      "units": "m",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "range": [
+        -5.0,
+        5.0
+      ]
+    },
+    "INS__POS3_X": {
+      "description": "Z position of the third IMU accelerometer in body frame. Positive Z is down from the origin. Attention: The IMU should be located as close to the vehicle c.g. as practical so that the value of this parameter is minimised. Failure to do so can result in noisy navigation velocity measurements due to vibration and IMU gyro noise. If the IMU cannot be moved and velocity noise is a problem, a location closer to the IMU can be used as the body frame origin.",
+      "units": "m",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "range": [
+        -5.0,
+        5.0
+      ]
+    },
+    "INS__GYR_ID": {
+      "description": "Gyro sensor ID, taking into account its type, bus and instance",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "INS__GYR2_ID": {
+      "description": "Gyro2 sensor ID, taking into account its type, bus and instance",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "INS__GYR3_ID": {
+      "description": "Gyro3 sensor ID, taking into account its type, bus and instance",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "INS__ACC_ID": {
+      "description": "Accelerometer sensor ID, taking into account its type, bus and instance",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "INS__ACC2_ID": {
+      "description": "Accelerometer2 sensor ID, taking into account its type, bus and instance",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "INS__ACC3_ID": {
+      "description": "Accelerometer3 sensor ID, taking into account its type, bus and instance",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "INS__FAST_SAMPLE": {
+      "description": "Mask of IMUs to enable fast sampling on, if available",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "INS__ENABLE_MASK": {
+      "description": "Bitmask of IMUs to enable. It can be used to prevent startup of specific detected IMUs",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "INS__GYRO_RATE": {
+      "description": "Gyro rate for IMUs with fast sampling enabled. The gyro rate is the sample rate at which the IMU filters operate and needs to be at least double the maximum filter frequency. If the sensor does not support the selected rate the next highest supported rate will be used. For IMUs which do not support fast sampling this setting is ignored and the default gyro rate of 1Khz is used.",
+      "units": "",
+      "reboot": true,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp",
+      "enum": {
+        "0": "1kHz",
+        "1": "2kHz",
+        "2": "4kHz",
+        "3": "8kHz"
+      }
+    },
+    "INS__ACC1_CALTEMP": {
+      "description": "Temperature that the 1st accelerometer was calibrated at",
+      "units": "degC",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "INS__GYR1_CALTEMP": {
+      "description": "Temperature that the 1st gyroscope was calibrated at",
+      "units": "degC",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "INS__ACC2_CALTEMP": {
+      "description": "Temperature that the 2nd accelerometer was calibrated at",
+      "units": "degC",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "INS__GYR2_CALTEMP": {
+      "description": "Temperature that the 2nd gyroscope was calibrated at",
+      "units": "degC",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "INS__ACC3_CALTEMP": {
+      "description": "Temperature that the 3rd accelerometer was calibrated at",
+      "units": "degC",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "INS__GYR3_CALTEMP": {
+      "description": "Temperature that the 3rd gyroscope was calibrated at",
+      "units": "degC",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "INS__TCAL_OPTIONS": {
+      "description": "This enables optional temperature calibration features. Setting of the Persist bits will save the temperature and/or accelerometer calibration parameters in the bootloader sector on the next update of the bootloader.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "INS__RAW_LOG_OPT": {
+      "description": "Raw logging options bitmask",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
+    },
+    "BATT_VOLT_PIN": {
+      "description": "Sets the analog input pin that should be used for voltage monitoring.",
+      "units": "",
+      "reboot": true,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_BattMonitor/AP_BattMonitor_Analog.cpp",
+      "range": [
+        -1.0,
+        127.0
+      ],
+      "enum": {
+        "-1": "Disabled",
+        "2": "Pixhawk/Pixracer/Navio2/Pixhawk2_PM1",
+        "5": "Navigator",
+        "13": "Pixhawk2_PM2/CubeOrange_PM2",
+        "14": "CubeOrange",
+        "16": "Durandal",
+        "100": "PX4-v1"
+      }
+    },
+    "BATT_CURR_PIN": {
+      "description": "Sets the analog input pin that should be used for current monitoring.",
+      "units": "",
+      "reboot": true,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_BattMonitor/AP_BattMonitor_Analog.cpp",
+      "range": [
+        -1.0,
+        127.0
+      ],
+      "enum": {
+        "-1": "Disabled",
+        "3": "Pixhawk/Pixracer/Navio2/Pixhawk2_PM1",
+        "4": "CubeOrange_PM2/Navigator",
+        "14": "Pixhawk2_PM2",
+        "15": "CubeOrange",
+        "17": "Durandal",
+        "101": "PX4-v1"
+      }
+    },
+    "BATT_VOLT_MULT": {
+      "description": "Used to convert the voltage of the voltage sensing pin (@PREFIX@VOLT_PIN) to the actual battery's voltage (pin_voltage * VOLT_MULT). For the 3DR Power brick with a Pixhawk, this should be set to 10.1. For the Pixhawk with the 3DR 4in1 ESC this should be 12.02. For the PX using the PX4IO power supply this should be set to 1.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_BattMonitor/AP_BattMonitor_Analog.cpp"
+    },
+    "BATT_AMP_PERVLT": {
+      "description": "Number of amps that a 1V reading on the current sensor corresponds to. With a Pixhawk using the 3DR Power brick this should be set to 17. For the Pixhawk with the 3DR 4in1 ESC this should be 17. For Synthetic Current sensor monitors, this is the maximum, full throttle current draw.",
+      "units": "A/V",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_BattMonitor/AP_BattMonitor_Analog.cpp"
+    },
+    "BATT_AMP_OFFSET": {
+      "description": "Voltage offset at zero current on current sensor for Analog Sensors. For Synthetic Current sensor, this offset is the zero throttle system current and is added to the calculated throttle base current.",
+      "units": "V",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_BattMonitor/AP_BattMonitor_Analog.cpp"
+    },
+    "BATT_VLT_OFFSET": {
+      "description": "Voltage offset on voltage pin. This allows for an offset due to a diode. This voltage is subtracted before the scaling is applied.",
+      "units": "V",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_BattMonitor/AP_BattMonitor_Analog.cpp"
+    },
+    "GPS__NAVFILTER": {
+      "description": "Navigation filter engine setting",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_GPS/AP_GPS.cpp",
+      "enum": {
+        "0": "Portable",
+        "2": "Stationary",
+        "3": "Pedestrian",
+        "4": "Automotive",
+        "5": "Sea",
+        "6": "Airborne1G",
+        "7": "Airborne2G",
+        "8": "Airborne4G"
+      }
+    },
+    "GPS__AUTO_SWITCH": {
+      "description": "Automatic switchover to GPS reporting best lock, 1:UseBest selects the GPS with highest status, if both are equal the GPS with highest satellite count is used 4:Use primary if 3D fix or better, will revert to 'UseBest' behaviour if 3D fix is lost on primary",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_GPS/AP_GPS.cpp",
+      "enum": {
+        "0": "Use primary",
+        "1": "UseBest",
+        "2": "Blend",
+        "4": "Use primary if 3D fix or better"
+      }
+    },
+    "GPS__SBAS_MODE": {
+      "description": "This sets the SBAS (satellite based augmentation system) mode if available on this GPS. If set to 2 then the SBAS mode is not changed in the GPS. Otherwise the GPS will be reconfigured to enable/disable SBAS. Disabling SBAS may be worthwhile in some parts of the world where an SBAS signal is available but the baseline is too long to be useful.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_GPS/AP_GPS.cpp",
+      "enum": {
+        "0": "Disabled",
+        "1": "Enabled",
+        "2": "NoChange"
+      }
+    },
+    "GPS__MIN_ELEV": {
+      "description": "This sets the minimum elevation of satellites above the horizon for them to be used for navigation. Setting this to -100 leaves the minimum elevation set to the GPS modules default.",
+      "units": "deg",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_GPS/AP_GPS.cpp",
+      "range": [
+        -100.0,
+        90.0
+      ]
+    },
+    "GPS__INJECT_TO": {
+      "description": "The GGS can send raw serial packets to inject data to multiple GPSes.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_GPS/AP_GPS.cpp",
+      "enum": {
+        "0": "send to first GPS",
+        "1": "send to 2nd GPS",
+        "127": "send to all"
+      }
+    },
+    "GPS__SBP_LOGMASK": {
+      "description": "Masked with the SBP msg_type field to determine whether SBR1/SBR2 data is logged",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_GPS/AP_GPS.cpp",
+      "enum": {
+        "0": "None (0x0000)",
+        "-1": "All (0xFFFF)",
+        "-256": "External only (0xFF00)"
+      }
+    },
+    "GPS__RAW_DATA": {
+      "description": "Handles logging raw data; on uBlox chips that support raw data this will log RXM messages into logger; on Septentrio this will log on the equipment's SD card and when set to 2, the autopilot will try to stop logging after disarming and restart after arming",
+      "units": "",
+      "reboot": true,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_GPS/AP_GPS.cpp",
+      "enum": {
+        "0": "Ignore",
+        "1": "Always log",
+        "2": "Stop logging when disarmed (SBF only)",
+        "5": "Only log every five samples (uBlox only)"
+      }
+    },
+    "GPS__SAVE_CFG": {
+      "description": "Determines whether the configuration for this GPS should be written to non-volatile memory on the GPS. Currently working for UBlox 6 series and above.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_GPS/AP_GPS.cpp",
+      "enum": {
+        "0": "Do not save config",
+        "1": "Save config",
+        "2": "Save only when needed"
+      }
+    },
+    "GPS__AUTO_CONFIG": {
+      "description": "Controls if the autopilot should automatically configure the GPS based on the parameters and default settings",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_GPS/AP_GPS.cpp",
+      "enum": {
+        "0": "Disables automatic configuration",
+        "1": "Enable automatic configuration for Serial GPSes only",
+        "2": "Enable automatic configuration for DroneCAN as well",
+        "3": "Clear all configurations not set by ardupilot (UBlox only)"
+      }
+    },
+    "GPS__BLEND_MASK": {
+      "description": "Determines which of the accuracy measures Horizontal position, Vertical Position and Speed are used to calculate the weighting on each GPS receiver when soft switching has been selected by setting GPS_AUTO_SWITCH to 2(Blend)",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_GPS/AP_GPS.cpp"
+    },
+    "GPS__BLEND_TC": {
+      "description": "Controls the slowest time constant applied to the calculation of GPS position and height offsets used to adjust different GPS receivers for steady state position differences.",
+      "units": "s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_GPS/AP_GPS.cpp",
+      "range": [
+        5.0,
+        30.0
+      ]
+    },
+    "GPS__DRV_OPTIONS": {
+      "description": "Additional backend specific options",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_GPS/AP_GPS.cpp"
+    },
+    "GPS__PRIMARY": {
+      "description": "This GPS will be used when GPS_AUTO_SWITCH is 0 and used preferentially with GPS_AUTO_SWITCH = 4.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_GPS/AP_GPS.cpp",
+      "enum": {
+        "0": "FirstGPS",
+        "1": "SecondGPS"
+      }
+    },
+    "GPS__TYPE": {
+      "description": "GPS Node id for second-discovered GPS.Renamed in 4.6 and later to GPS2_CAN_NODEID.",
+      "units": "ms",
+      "reboot": true,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_GPS/AP_GPS.cpp",
+      "range": [
+        0.0,
+        10.0
+      ],
+      "enum": {
+        "0": "COM1(RS232) on GSOF",
+        "1": "COM2(TTL) on GSOF"
+      }
+    },
+    "FENCE_ENABLE": {
+      "description": "Allows you to enable (1) or disable (0) the fence functionality. Fences can still be enabled and disabled via mavlink or an RC option, but these changes are not persisted.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_Fence/AC_Fence.cpp",
+      "enum": {
+        "0": "Disabled",
+        "1": "Enabled"
+      }
+    },
+    "FENCE_TYPE": {
+      "description": "Configured fence types held as bitmask. Max altitide, Circle and Polygon fences will be immediately enabled if configured. Min altitude fence will only be enabled once the minimum altitude is reached.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_Fence/AC_Fence.cpp"
+    },
+    "FENCE_ACTION": {
+      "description": "What action should be taken when fence is breached",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_Fence/AC_Fence.cpp",
+      "enum": {
+        "0": "Report Only",
+        "1": "RTL or Land"
+      }
+    },
+    "FENCE_ALT_MAX": {
+      "description": "Maximum altitude allowed before geofence triggers. See FENCE_ALT_MAX_TP for reference frame.",
+      "units": "m",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_Fence/AC_Fence.cpp",
+      "range": [
+        10.0,
+        1000.0
+      ]
+    },
+    "FENCE_RADIUS": {
+      "description": "Circle fence radius which when breached will cause an RTL",
+      "units": "m",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_Fence/AC_Fence.cpp",
+      "range": [
+        30.0,
+        10000.0
+      ]
+    },
+    "FENCE_MARGIN": {
+      "description": "Distance that autopilot's should maintain from the fence to avoid a breach",
+      "units": "m",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_Fence/AC_Fence.cpp",
+      "range": [
+        1.0,
+        10.0
+      ]
+    },
+    "FENCE_TOTAL": {
+      "description": "Number of polygon points saved in eeprom (do not update manually)",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_Fence/AC_Fence.cpp",
+      "range": [
+        1.0,
+        20.0
+      ]
+    },
+    "FENCE_ALT_MIN": {
+      "description": "Minimum altitude allowed before geofence triggers. See FENCE_ALT_MIN_TP for reference frame.",
+      "units": "m",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_Fence/AC_Fence.cpp",
+      "range": [
+        -100.0,
+        100.0
+      ]
+    },
+    "FENCE_RET_RALLY": {
+      "description": "Should the vehicle return to fence return point or rally point",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_Fence/AC_Fence.cpp",
+      "range": [
+        0.0,
+        1.0
+      ],
+      "enum": {
+        "0": "Fence Return Point",
+        "1": "Nearest Rally Point"
+      }
+    },
+    "FENCE_RET_ALT": {
+      "description": "Altitude the vehicle will transit to when a fence breach occurs",
+      "units": "m",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_Fence/AC_Fence.cpp",
+      "range": [
+        0.0,
+        32767.0
+      ]
+    },
+    "FENCE_AUTOENABLE": {
+      "description": "Auto-enable of fences. AutoEnableOnTakeoff enables all configured fences, except the minimum altitude fence (which is enabled when the minimum altitude is reached), after autotakeoffs reach altitude. During autolandings the fences will be disabled.  AutoEnableDisableFloorOnLanding enables all configured fences, except the minimum altitude fence (which is enabled when the minimum altitude is reached), after autotakeoffs reach altitude. During autolandings only the Minimum Altitude fence will be disabled. AutoEnableOnlyWhenArmed enables all configured fences on arming, except the minimum altitude fence (which is enabled when the minimum altitude is reached), but no fences are disabled during autolandings. However, fence breaches are ignored while executing prior breach recovery actions which may include autolandings.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_Fence/AC_Fence.cpp",
+      "range": [
+        0.0,
+        3.0
+      ]
+    },
+    "FENCE_OPTIONS": {
+      "description": "When bit 0 is set disable mode change following fence action until fence breach is cleared. When bit 1 is set the allowable flight areas is the union of all polygon and circle fence areas instead of the intersection, which means a fence breach occurs only if you are outside all of the fence areas.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_Fence/AC_Fence.cpp"
+    },
+    "FENCE_NTF_FREQ": {
+      "description": "When bit 2 of FENCE_OPTIONS is set this parameter controls the frequency of margin breach notifications. If set to 0 only new margin breaches are notified.",
+      "units": "Hz",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_Fence/AC_Fence.cpp",
+      "range": [
+        0.0,
+        10.0
+      ]
+    },
+    "FENCE_MARGIN_XY": {
+      "description": "Distance that autopilot's should maintain from the fence in the horizontal plane to avoid a breach. If set to 0 then FENCE_MARGIN is used.",
+      "units": "m",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_Fence/AC_Fence.cpp",
+      "range": [
+        0.0,
+        50.0
+      ]
+    },
+    "FENCE_ALT_MAX_TP": {
+      "description": "The altitude reference frame for the maximum altitude fence. Can be AMSL, home-relative, origin relative or AGL.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_Fence/AC_Fence.cpp",
+      "enum": {
+        "0": "Above sea level",
+        "1": "Above Home",
+        "2": "Above Origin",
+        "3": "Above Terrain"
+      }
+    },
+    "FENCE_ALT_MIN_TP": {
+      "description": "The altitude reference frame for the minimum altitude fence. Can be AMSL, home-relative, origin relative or AGL.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_Fence/AC_Fence.cpp",
+      "enum": {
+        "0": "Above sea level",
+        "1": "Above Home",
+        "2": "Above Origin",
+        "3": "Above Terrain"
+      }
+    },
+    "RC1_MIN": {
+      "description": "RC minimum PWM pulse width in microseconds. Typically 1000 is lower limit, 1500 is neutral and 2000 is upper limit.",
+      "units": "PWM",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/RC_Channel/RC_Channel.cpp",
+      "range": [
+        800.0,
+        2200.0
+      ]
+    },
+    "RC1_TRIM": {
+      "description": "RC trim (neutral) PWM pulse width in microseconds. Typically 1000 is lower limit, 1500 is neutral and 2000 is upper limit.",
+      "units": "PWM",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/RC_Channel/RC_Channel.cpp",
+      "range": [
+        800.0,
+        2200.0
+      ]
+    },
+    "RC1_MAX": {
+      "description": "RC maximum PWM pulse width in microseconds. Typically 1000 is lower limit, 1500 is neutral and 2000 is upper limit.",
+      "units": "PWM",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/RC_Channel/RC_Channel.cpp",
+      "range": [
+        800.0,
+        2200.0
+      ]
+    },
+    "RC1_REVERSED": {
+      "description": "Reverse channel input. Set to 0 for normal operation. Set to 1 to reverse this input channel.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/RC_Channel/RC_Channel.cpp",
+      "enum": {
+        "0": "Normal",
+        "1": "Reversed"
+      }
+    },
+    "RC1_DZ": {
+      "description": "PWM dead zone in microseconds around trim or bottom",
+      "units": "PWM",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/RC_Channel/RC_Channel.cpp",
+      "range": [
+        0.0,
+        200.0
+      ]
+    },
+    "RC1_OPTION": {
+      "description": "Function assigned to this RC channel",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/RC_Channel/RC_Channel.cpp"
+    },
+    "SERVO1_MIN": {
+      "description": "minimum PWM pulse width in microseconds. Typically 1000 is lower limit, 1500 is neutral and 2000 is upper limit.",
+      "units": "PWM",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/SRV_Channel/SRV_Channel.cpp",
+      "range": [
+        800.0,
+        2200.0
+      ]
+    },
+    "SERVO1_MAX": {
+      "description": "maximum PWM pulse width in microseconds. Typically 1000 is lower limit, 1500 is neutral and 2000 is upper limit.",
+      "units": "PWM",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/SRV_Channel/SRV_Channel.cpp",
+      "range": [
+        800.0,
+        2200.0
+      ]
+    },
+    "SERVO1_TRIM": {
+      "description": "Trim PWM pulse width in microseconds. Typically 1000 is lower limit, 1500 is neutral and 2000 is upper limit.",
+      "units": "PWM",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/SRV_Channel/SRV_Channel.cpp",
+      "range": [
+        800.0,
+        2200.0
+      ]
+    },
+    "SERVO1_REVERSED": {
+      "description": "Reverse servo operation. Set to 0 for normal operation. Set to 1 to reverse this output channel.",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/SRV_Channel/SRV_Channel.cpp",
+      "enum": {
+        "0": "Normal",
+        "1": "Reversed"
+      }
+    },
+    "SERVO1_FUNCTION": {
+      "description": "Function assigned to this servo. Setting this to Disabled(0) will setup this output for control by auto missions or MAVLink servo set commands. any other value will enable the corresponding function",
+      "units": "",
+      "reboot": true,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/SRV_Channel/SRV_Channel.cpp",
+      "enum": {
+        "180": "CameraZoom"
+      }
+    },
+    "ATC_RATE_FF_ENAB": {
+      "description": "Controls whether body-frame rate feedforward is enabled or disabled",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp",
+      "enum": {
+        "0": "Disabled",
+        "1": "Enabled"
+      }
+    },
+    "ATC_ANGLE_BOOST": {
+      "description": "Angle Boost increases output throttle as the vehicle leans to reduce loss of altitude",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp",
+      "enum": {
+        "0": "Disabled",
+        "1": "Enabled"
+      }
+    },
+    "ATC_ANG_RLL_P": {
+      "description": "Roll axis angle controller P gain.  Converts the error between the desired roll angle and actual angle to a desired roll rate",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp",
+      "range": [
+        3.0,
+        12.0
+      ]
+    },
+    "ATC_ANG_PIT_P": {
+      "description": "Pitch axis angle controller P gain.  Converts the error between the desired pitch angle and actual angle to a desired pitch rate",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp",
+      "range": [
+        3.0,
+        12.0
+      ]
+    },
+    "ATC_ANG_YAW_P": {
+      "description": "Yaw axis angle controller P gain.  Converts the error between the desired yaw angle and actual angle to a desired yaw rate",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp",
+      "range": [
+        3.0,
+        12.0
+      ]
+    },
+    "ATC_ANG_LIM_TC": {
+      "description": "Angle Limit (to maintain altitude) Time Constant",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp",
+      "range": [
+        0.5,
+        10.0
+      ]
+    },
+    "ATC_RATE_R_MAX": {
+      "description": "Maximum angular velocity in roll axis",
+      "units": "deg/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp",
+      "range": [
+        0.0,
+        1080.0
+      ],
+      "enum": {
+        "0": "Disabled",
+        "60": "Slow",
+        "180": "Medium",
+        "360": "Fast"
+      }
+    },
+    "ATC_RATE_P_MAX": {
+      "description": "Maximum angular velocity in pitch axis",
+      "units": "deg/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp",
+      "range": [
+        0.0,
+        1080.0
+      ],
+      "enum": {
+        "0": "Disabled",
+        "60": "Slow",
+        "180": "Medium",
+        "360": "Fast"
+      }
+    },
+    "ATC_RATE_Y_MAX": {
+      "description": "Maximum angular velocity in yaw axis",
+      "units": "deg/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp",
+      "range": [
+        0.0,
+        1080.0
+      ],
+      "enum": {
+        "0": "Disabled",
+        "60": "Slow",
+        "180": "Medium",
+        "360": "Fast"
+      }
+    },
+    "ATC_INPUT_TC": {
+      "description": "Attitude control input time constant.  Low numbers lead to sharper response, higher numbers to softer response",
+      "units": "s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp",
+      "range": [
+        0.0,
+        1.0
+      ],
+      "enum": {
+        "0.5": "Very Soft",
+        "0.2": "Soft",
+        "0.15": "Medium",
+        "0.1": "Crisp",
+        "0.05": "Very Crisp"
+      }
+    },
+    "ATC_LAND_R_MULT": {
+      "description": "Roll gain multiplier active when landed. A factor of 1.0 means no reduction in gain while landed. Reduce this factor to reduce ground oscitation in the roll axis. ",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp",
+      "range": [
+        0.25,
+        1.0
+      ]
+    },
+    "ATC_LAND_P_MULT": {
+      "description": "Pitch gain multiplier active when landed. A factor of 1.0 means no reduction in gain while landed. Reduce this factor to reduce ground oscitation in the pitch axis. ",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp",
+      "range": [
+        0.25,
+        1.0
+      ]
+    },
+    "ATC_LAND_Y_MULT": {
+      "description": "Yaw gain multiplier active when landed. A factor of 1.0 means no reduction in gain while landed. Reduce this factor to reduce ground oscitation in the yaw axis. ",
+      "units": "",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp",
+      "range": [
+        0.25,
+        1.0
+      ]
+    },
+    "ATC_ANGLE_MAX": {
+      "description": "Maximum lean angle in all flight modes",
+      "units": "deg",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp",
+      "range": [
+        10.0,
+        80.0
+      ]
+    },
+    "ATC_RATE_WPY_MAX": {
+      "description": "Maximum rate the yaw target can be updated in Auto, Guided, Circle, Follow, RTL, SmartRTL, Throw and ZigZag flight modes",
+      "units": "deg/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp",
+      "range": [
+        5.0,
+        180.0
+      ]
+    },
+    "ATC_ACC_Y_MAX": {
+      "description": "Maximum acceleration in yaw axis",
+      "units": "deg/s/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp",
+      "range": [
+        0.0,
+        720.0
+      ],
+      "enum": {
+        "0": "Disabled",
+        "90": "VerySlow",
+        "180": "Slow",
+        "360": "Medium",
+        "540": "Fast"
+      }
+    },
+    "ATC_ACC_R_MAX": {
+      "description": "Maximum acceleration in roll axis",
+      "units": "deg/s/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp",
+      "range": [
+        0.0,
+        1800.0
+      ],
+      "enum": {
+        "0": "Disabled",
+        "300": "VerySlow",
+        "720": "Slow",
+        "1080": "Medium",
+        "1620": "Fast"
+      }
+    },
+    "ATC_ACC_P_MAX": {
+      "description": "Maximum acceleration in pitch axis",
+      "units": "deg/s/s",
+      "reboot": false,
+      "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_AttitudeControl/AC_AttitudeControl.cpp",
+      "range": [
+        0.0,
+        1800.0
+      ],
+      "enum": {
+        "0": "Disabled",
+        "300": "VerySlow",
+        "720": "Slow",
+        "1080": "Medium",
+        "1620": "Fast"
+      }
+    }
+  }
+}

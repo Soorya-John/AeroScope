@@ -76,7 +76,7 @@
     $('#calibration-status').textContent=JSON.stringify(setup.calibration,null,2);$('#calibration-position').disabled=setup.calibration.kind!=='accelerometer'||![1,2,3,4,5,6].includes(setup.calibration.position);$('#cancel-calibration').disabled=setup.calibration.kind!=='compass'||!['RUNNING','WAITING_ACK'].includes(setup.calibration.state);
     $('#readiness-messages').innerHTML=setup.messages.slice(-10).map(m=>`<p>${esc(m.text)}</p>`).join('')||'<p>No vehicle status text received. Absence of messages is not a readiness check.</p>';
     $('#transaction-rows').innerHTML=control.transactions.slice(0,30).map(t=>`<tr><td>${t.command}</td><td>${esc(t.state)} ${esc(t.result||'')}</td><td>${esc(t.detail||'')} ${t.progress??''}</td></tr>`).join('')||'<tr><td colspan="3">No commands in this session</td></tr>';
-    for(const b of transactionPanel.querySelectorAll('[data-flight-mode]')){b.disabled=owner!==A.clientId||!(cap.modes||[]).includes(b.dataset.flightMode);b.title=b.disabled?'Requires control ownership and a mode reported by this firmware':''}
+    for(const b of transactionPanel.querySelectorAll('[data-flight-mode]')){b.disabled=owner!==A.clientId||!(cap.capabilities?.modes||[]).includes(b.dataset.flightMode);b.title=b.disabled?'Requires control ownership and a mode reported by this firmware':''}
     $('#batch-status').textContent=JSON.stringify(batch,null,2);
     if(batch.state==='VERIFIED'){for(const r of batch.changes)if(drafts[r.name]&&Number(drafts[r.name].value)===r.after)delete drafts[r.name];saveDrafts()}
     drawConfig();

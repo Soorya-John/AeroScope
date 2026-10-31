@@ -219,7 +219,10 @@ class Handler(BaseHTTPRequestHandler):
             elif path == "/api/control/arm":
                 self._send_json(200, {"protocol_version": 1, "armed": vehicle_state.snapshot()["status"]["armed"], "request": mavlink.arm_status()})
             elif path == "/api/parameters":
-                self._send_json(200, {"protocol_version": 1, **mavlink.parameters.snapshot(str(query.get("search", [""])[0]))})
+                from .metadata import parameter_metadata
+                data=mavlink.parameters.snapshot(str(query.get('search',[''])[0])); metadata=parameter_metadata(vehicle_state.snapshot()['vehicle'])
+                for p in data['parameters']:p['metadata']=metadata.get(p['name'],{})
+                self._send_json(200, {"protocol_version": 1, **data})
             elif path == "/api/parameters/snapshots":
                 self._send_json(200,{"snapshots":store.list_parameter_snapshots()})
             elif path == "/api/parameters/compare":
