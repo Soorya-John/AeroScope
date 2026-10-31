@@ -4,6 +4,7 @@ import importlib.util
 import json
 import struct
 import sys
+import threading
 import time
 from contextlib import contextmanager
 import unittest
@@ -18,7 +19,11 @@ from app.state import VehicleState
 from app.store import Store
 from app.telemetry import TelemetryNormalizer
 from app.simulator import Simulator
-from app.mavlink import validate_connection
+from app.mavlink import MavlinkManager, validate_connection
+from app.transactions import TransactionManager
+from app.parameters import (ParameterStore, validate_parameter_value, validate_ext_parameter_value,
+    parse_ext_parameter_value, compare_parameter_snapshots)
+from app.missions import MissionManager, validate_mission
 
 TEST_TEMP_ROOT = Path(__file__).resolve().parent / ".test-tmp"
 TEST_TEMP_ROOT.mkdir(exist_ok=True)
@@ -78,6 +83,275 @@ class TelemetryTests(unittest.TestCase):
         self.assertEqual(snapshot["connection"]["state"], "disconnected")
         self.assertFalse(snapshot["attitude"]["roll"]["available"])
         self.assertIsNone(snapshot["position"]["latitude_deg"]["value"])
+
+    def test_command_transaction_ack_correlation_and_session_cancellation(self):
+        txs = TransactionManager()
+        txs.begin_session("session-a")
+        tx = txs.create(400, 1, 1, timeout=1)
+        txs.mark_sent(tx.id)
+        self.assertIsNone(txs.acknowledge(22, 1, 1, 0))
+        self.assertIsNone(txs.acknowledge(400, 2, 1, 0))
+        self.assertIsNone(txs.acknowledge(400, 1, 2, 0))
+        result = txs.acknowledge(400, 1, 1, 5, progress=40)
+        self.assertEqual(result["state"], "IN_PROGRESS")
+        result = txs.acknowledge(400, 1, 1, 0)
+        self.assertEqual(result["state"], "SUCCEEDED")
+        failed = txs.create(21, 1, 1)
+        txs.mark_sent(failed.id)
+        txs.transmission_failed(failed.id, "serial port closed")
+        self.assertEqual(next(x for x in txs.list() if x["id"] == failed.id)["state"], "FAILED")
+        pending = txs.create(22, 1, 1)
+        txs.begin_session("session-b")
+        self.assertEqual(next(x for x in txs.list() if x["id"] == pending.id)["state"], "CANCELLED")
+
+    def test_writer_failure_is_recorded_for_modes_and_commands(self):
+        manager=MavlinkManager(self.state,self.events,self.normalizer)
+        manager._session_id="writer-session"; manager.transactions.begin_session("writer-session")
+        self.normalizer.ingest(FakeMessage("HEARTBEAT",{"base_mode":0,"custom_mode":0,"type":2,"autopilot":3,"system_status":4}))
+        self.state.set_connection("connected","test","test")
+        class FakeMav:
+            def command_long_send(self,*args): raise OSError("link write failed")
+        class FakeConnection:
+            mav=FakeMav()
+            def set_mode(self,mode): raise OSError("mode write failed")
+        connection=FakeConnection(); manager._connection=connection
+        manager._mode_request={"request_id":"mode-1","session_id":"writer-session","state":"PENDING"}
+        manager._outbound.put(("writer-session",{"kind":"mode","request_id":"mode-1","mode":"GUIDED"}))
+        tx=manager.transactions.create(400,1,1)
+        manager._outbound.put(("writer-session",(tx.id,400,(1,0,0,0,0,0,0),1,1)))
+        manager._writer_stop.clear()
+        worker=threading.Thread(target=manager._writer,args=(connection,"writer-session"),daemon=True)
+        worker.start()
+        deadline=time.monotonic()+2
+        while time.monotonic()<deadline and manager._mode_request["state"]=="PENDING":time.sleep(.01)
+        manager._writer_stop.set(); worker.join(1)
+        self.assertEqual(manager._mode_request["state"],"FAILED")
+        self.assertIn("mode write failed",manager._mode_request["detail"])
+        command=next(item for item in manager.transactions.list() if item["id"]==tx.id)
+        self.assertEqual(command["state"],"FAILED")
+        self.assertIn("link write failed",command["detail"])
+
+    def test_mavlink_command_uses_normalized_heartbeat_target_ids(self):
+        manager = MavlinkManager(self.state, self.events, self.normalizer)
+        manager._session_id = "session-target"
+        manager.transactions.begin_session("session-target")
+        self.normalizer.ingest(FakeMessage("HEARTBEAT", {"base_mode": 0, "custom_mode": 0,
+            "type": 2, "autopilot": 3, "system_status": 4}, system=7, component=42))
+        self.state.set_connection("connected", "test", "test")
+        tx = manager.queue_command(400, (1, 0, 0, 0, 0, 0, 0))
+        self.assertEqual(tx["target_system"], 7)
+        self.assertEqual(tx["target_component"], 42)
+        manager.disconnect()
+
+    def test_mode_request_requires_confirmation_and_firmware_mapping(self):
+        manager = MavlinkManager(self.state, self.events, self.normalizer)
+        manager._session_id = "mode-session"
+        manager.transactions.begin_session("mode-session")
+        self.normalizer.ingest(FakeMessage("HEARTBEAT", {"base_mode": 0, "custom_mode": 0,
+            "type": 2, "autopilot": 3, "system_status": 4}, system=1, component=1))
+        self.state.set_connection("connected", "test", "test")
+        manager._capabilities = {"available": True, "modes": ["GUIDED"]}
+        with self.assertRaisesRegex(ValueError, "confirmation"):
+            manager.request_mode("GUIDED")
+        with self.assertRaisesRegex(ValueError, "not available"):
+            manager.request_mode("UNKNOWN", confirmed=True)
+        request = manager.request_mode("GUIDED", confirmed=True)
+        self.assertEqual(request["state"], "PENDING")
+        self.assertEqual(manager._outbound.qsize(), 1)
+        manager.disconnect()
+
+    def test_autopilot_version_is_requested_once_and_capabilities_are_decoded(self):
+        manager=MavlinkManager(self.state,self.events,self.normalizer)
+        manager._session_id="cap-session"; manager.transactions.begin_session("cap-session")
+        self.normalizer.ingest(FakeMessage("HEARTBEAT",{"base_mode":0,"custom_mode":0,"type":2,"autopilot":3,"system_status":4}))
+        self.state.set_connection("connected","test","test")
+        tx=manager._request_autopilot_version_once()
+        self.assertEqual(tx["command"],512)
+        queued=manager._outbound.get_nowait()
+        self.assertEqual(queued[1][1],512)
+        self.assertEqual(queued[1][2][0],148.0)
+        self.assertIsNone(manager._request_autopilot_version_once())
+        manager.transactions.mark_sent(tx["id"])
+        self.normalizer.ingest(FakeMessage("AUTOPILOT_VERSION",{"flight_sw_version":0x01020304,
+            "middleware_sw_version":0x02000000,"os_sw_version":0x03000000,"board_version":7,
+            "flight_custom_version":bytes(range(1,9)),"middleware_custom_version":b"\0"*8,
+            "os_custom_version":b"\0"*8,"vendor_id":42,"product_id":9,
+            "capabilities":8192|4|16|16384}))
+        caps=manager.capabilities()
+        self.assertEqual(self.state.snapshot()["vehicle"]["firmware"]["value"],"1.2.3.4")
+        self.assertEqual(caps["firmware_details"]["vendor_id"],42)
+        self.assertTrue(caps["protocol_flags"]["mission_int"])
+        self.assertTrue(caps["protocol_flags"]["param_bytewise"])
+        self.assertTrue(caps["protocol_flags"]["mavlink2"])
+        self.assertTrue(caps["protocol_flags"]["mission_fence"])
+
+    def test_mission_wire_format_uses_advertised_capabilities(self):
+        manager=MavlinkManager(self.state,self.events,self.normalizer); manager._session_id="mission-caps"
+        manager.transactions.begin_session("mission-caps")
+        self.normalizer.ingest(FakeMessage("HEARTBEAT",{"base_mode":0,"custom_mode":0,"type":2,"autopilot":3,"system_status":4}))
+        self.state.set_connection("connected","test","test")
+        self.state.set("vehicle","protocol_capabilities",1)
+        self.assertIs(manager._mission_integer_protocol(),False)
+        manager._require_mission_support()
+        self.state.set("vehicle","protocol_capabilities",4)
+        self.assertIs(manager._mission_integer_protocol(),True)
+        self.state.set("vehicle","protocol_capabilities",0)
+        with self.assertRaisesRegex(RuntimeError,"no supported MAVLink mission"):
+            manager.request_mission_download()
+
+    def test_writer_sends_legacy_mission_format_when_vehicle_requests_it(self):
+        manager=MavlinkManager(self.state,self.events,self.normalizer); manager._session_id="legacy-mission"
+        manager.transactions.begin_session("legacy-mission")
+        self.normalizer.ingest(FakeMessage("HEARTBEAT",{"base_mode":0,"custom_mode":0,"type":2,"autopilot":3,"system_status":4}))
+        self.state.set_connection("connected","test","test"); self.state.set("vehicle","protocol_capabilities",1)
+        calls=[]; both=threading.Event()
+        class FakeMav:
+            def __getattr__(self,name):
+                def send(*args):
+                    calls.append((name,args))
+                    if len(calls)==2: both.set()
+                return send
+        class FakeConnection: mav=FakeMav()
+        connection=FakeConnection(); manager._connection=connection
+        manager._outbound.put(("legacy-mission",{"kind":"mission_request","seq":2}))
+        item={"kind":"mission_item","integer":False,"seq":0,"frame":6,"command":16,"current":0,"autocontinue":1,
+              "param1":0.,"param2":0.,"param3":0.,"param4":0.,"latitude":37.5,"longitude":-122.1,"altitude":25.}
+        manager._outbound.put(("legacy-mission",item)); manager._writer_stop.clear()
+        worker=threading.Thread(target=manager._writer,args=(connection,"legacy-mission"),daemon=True); worker.start()
+        self.assertTrue(both.wait(2)); manager._writer_stop.set(); worker.join(1)
+        self.assertEqual([name for name,_ in calls],["mission_request_send","mission_item_send"])
+        self.assertEqual(calls[1][1][3],3)
+        self.assertEqual(calls[1][1][11:13],(37.5,-122.1))
+
+    def test_writer_serializes_param_ext_set_on_live_session(self):
+        manager=MavlinkManager(self.state,self.events,self.normalizer); manager._session_id="ext-session"
+        manager.transactions.begin_session("ext-session")
+        self.normalizer.ingest(FakeMessage("HEARTBEAT",{"base_mode":0,"custom_mode":0,"type":2,"autopilot":3,"system_status":4}))
+        self.state.set_connection("connected","test","test")
+        calls=[]; sent=threading.Event()
+        class FakeMav:
+            def param_ext_set_send(self,*args): calls.append(args); sent.set()
+        class FakeConnection: mav=FakeMav()
+        connection=FakeConnection(); manager._connection=connection
+        manager._outbound.put(("ext-session",{"kind":"param_ext_set","name":"WIDE","value":2**40,"type":7}))
+        manager._writer_stop.clear(); worker=threading.Thread(target=manager._writer,args=(connection,"ext-session"),daemon=True); worker.start()
+        self.assertTrue(sent.wait(2)); manager._writer_stop.set(); worker.join(1)
+        self.assertEqual(len(calls),1)
+        self.assertEqual(calls[0][3],str(2**40).encode().ljust(128,b"\0"))
+        self.assertEqual(calls[0][4],7)
+
+    def test_arm_request_requires_exact_confirmation_and_unknown_safety_ack(self):
+        manager = MavlinkManager(self.state, self.events, self.normalizer)
+        manager._session_id = "arm-session"
+        manager.transactions.begin_session("arm-session")
+        self.normalizer.ingest(FakeMessage("HEARTBEAT", {"base_mode": 0, "custom_mode": 0,
+            "type": 2, "autopilot": 3, "system_status": 4}, system=3, component=1))
+        self.state.set_connection("connected", "test", "test")
+        with self.assertRaisesRegex(ValueError, "Type ARM"):
+            manager.request_arm(True, confirmation="yes")
+        with self.assertRaisesRegex(ValueError, "Safety data unavailable"):
+            manager.request_arm(True, confirmation="ARM")
+        result = manager.request_arm(True, confirmation="ARM", acknowledge_unknown=True)
+        self.assertEqual(result["state"], "PENDING")
+        self.assertTrue(result["unknown_safety"])
+        queued = manager._outbound.get_nowait()
+        self.assertEqual(queued[1][1], 400)
+        self.assertEqual(queued[1][2][0], 1.0)
+        self.assertEqual(queued[1][2][1], 0.0)
+
+    def test_arm_confirmation_requires_accepted_ack_and_matching_heartbeat(self):
+        manager=MavlinkManager(self.state,self.events,self.normalizer)
+        manager._session_id="arm-confirm"; manager.transactions.begin_session("arm-confirm")
+        self.normalizer.ingest(FakeMessage("HEARTBEAT",{"base_mode":0,"custom_mode":0,"type":2,"autopilot":3,"system_status":4}))
+        self.state.set_connection("connected","test","test")
+        tx=manager.transactions.create(400,1,1); manager.transactions.mark_sent(tx.id)
+        manager._arm_request={"transaction_id":tx.id,"session_id":"arm-confirm","armed":True,"state":"PENDING"}
+        manager._sync_arm_status()
+        self.assertEqual(manager.arm_status()["state"],"PENDING")
+        manager.transactions.acknowledge(400,1,1,0)
+        manager._sync_arm_status()
+        self.assertEqual(manager.arm_status()["state"],"PENDING")
+        self.normalizer.ingest(FakeMessage("HEARTBEAT",{"base_mode":128,"custom_mode":0,"type":2,"autopilot":3,"system_status":4}))
+        manager._sync_arm_status()
+        self.assertEqual(manager.arm_status()["state"],"CONFIRMED")
+
+    def test_guided_reposition_requires_supported_firmware_mode_and_valid_target(self):
+        manager=MavlinkManager(self.state,self.events,self.normalizer); manager._session_id="guided"
+        manager.transactions.begin_session("guided")
+        self.normalizer.ingest(FakeMessage("HEARTBEAT",{"base_mode":0,"custom_mode":4,"type":2,"autopilot":3,"system_status":4},system=1,component=1))
+        self.state.set_connection("connected","test","test")
+        self.state.set('status','flight_mode','GUIDED')
+        with self.assertRaisesRegex(ValueError,"Type GO"):
+            manager.guided_reposition(37,-122,30)
+        with self.assertRaisesRegex(ValueError,"GPS fix"):
+            manager.guided_reposition(37,-122,30,confirmation="GO")
+        tx=manager.guided_reposition(37,-122,30,confirmation="GO",acknowledge_unknown=True)
+        self.assertEqual(tx["command"],192)
+        payload=manager._outbound.get_nowait()[1]
+        self.assertEqual(payload[2][4:7],(37.0,-122.0,30.0))
+        with self.assertRaises(ValueError): manager.guided_reposition(91,0,1,confirmation="GO",acknowledge_unknown=True)
+
+    def test_parameter_types_validation_and_echo_confirmation(self):
+        self.assertEqual(validate_parameter_value(42, 6), 42)
+        self.assertEqual(validate_parameter_value(1.25, 9), 1.25)
+        with self.assertRaises(ValueError): validate_parameter_value(1.2, 6)
+        with self.assertRaises(ValueError): validate_parameter_value(-1, 5)
+        params=ParameterStore(); params.begin_session("p1"); params.request_all(); params.pending_set("SERVOx", 3)
+        params.ingest("SERVOx", 3.0, 6, 0, 1)
+        snap=params.snapshot("servo")
+        self.assertTrue(snap["progress"]["complete"])
+        self.assertEqual(snap["pending"]["SERVOx"]["state"], "CONFIRMED")
+        params.request_one("MISSING")
+        params.expire(time.monotonic()+9)
+        self.assertEqual(params.snapshot()["pending"]["MISSING"]["state"],"UNKNOWN")
+        manager=MavlinkManager(self.state,self.events,self.normalizer); manager._session_id="param-write"
+        manager.transactions.begin_session("param-write"); manager.parameters.begin_session("param-write")
+        self.state.update_vehicle(simulated=False)
+        self.normalizer.ingest(FakeMessage("HEARTBEAT",{"base_mode":0,"custom_mode":0,"type":2,"autopilot":3,"system_status":4}))
+        self.state.set_connection("connected","test","test")
+        manager.parameters.ingest("BIG",1.0,5,0,1)
+        with self.assertRaisesRegex(ValueError,"represented exactly"):
+            manager.set_parameter("BIG",2**25+1)
+        manager.parameters.request_all()
+        manager.parameters.ingest("WIDE",1.0,10,1,2)
+        with self.assertRaisesRegex(ValueError,"not qualified"):
+            manager.set_parameter("WIDE",1.25)
+        self.assertEqual(validate_ext_parameter_value("custom",11),"custom")
+        self.assertEqual(validate_ext_parameter_value("18446744073709551615",7),2**64-1)
+        self.assertEqual(parse_ext_parameter_value(b"18446744073709551615\0",7),2**64-1)
+        self.assertEqual(parse_ext_parameter_value(b"mode-A\0",11),"mode-A")
+        with self.assertRaises(ValueError): validate_ext_parameter_value("x\0y",11)
+        params.pending_set("EXT_VALUE",2**40,"param_ext",7)
+        params.ingest("EXT_VALUE",float(2**40),7,1,2,protocol="param_ext")
+        self.assertEqual(params.snapshot()["pending"]["EXT_VALUE"]["state"],"PENDING")
+        ack=params.ingest_ext_ack("EXT_VALUE",2**40,7,3)
+        self.assertEqual(ack["state"],"IN_PROGRESS")
+        ack=params.ingest_ext_ack("EXT_VALUE",2**40,7,0)
+        self.assertEqual(ack["state"],"CONFIRMED")
+        changes=compare_parameter_snapshots([{"name":"A","value":1,"type":6},{"name":"B","value":2,"type":6}],
+            [{"name":"A","value":3,"type":6},{"name":"C","value":4,"type":6}])
+        self.assertEqual([x["change"] for x in changes],["modified","removed","added"])
+
+    def test_parameter_snapshots_persist_and_compare(self):
+        a=self.store.save_parameter_snapshot("before",[{"name":"GAIN","value":1.0,"type":9}])
+        b=self.store.save_parameter_snapshot("after",[{"name":"GAIN","value":2.0,"type":9}])
+        self.assertEqual(self.store.get_parameter_snapshot(a["id"])["name"],"before")
+        self.assertEqual(compare_parameter_snapshots(self.store.get_parameter_snapshot(a["id"])["parameters"],
+            self.store.get_parameter_snapshot(b["id"])["parameters"])[0]["change"],"modified")
+
+    def test_mission_download_completeness_upload_ack_and_validation(self):
+        manager=MissionManager(); manager.begin_session("mission-1"); manager.download_started(); manager.count(2)
+        self.assertTrue(manager.item({"seq":1,"command":16})); self.assertEqual(manager.snapshot()["state"],"DOWNLOADING")
+        self.assertTrue(manager.item({"seq":0,"command":16})); self.assertEqual(manager.snapshot()["state"],"SUCCEEDED")
+        items=validate_mission([{"command":16,"latitude":37.0,"longitude":-122.0,"altitude":50}])
+        manager.upload_started(items); self.assertEqual(manager.requested_item(0)["seq"],0)
+        manager.ack(3); self.assertEqual(manager.snapshot()["state"],"FAILED")
+        manager.update_current(0,2); manager.item_reached(0)
+        self.assertEqual(manager.snapshot()["progress"]["current"],0)
+        self.assertIn(0,manager.snapshot()["progress"]["reached"])
+        manager.clear_started(); manager.ack(0); self.assertEqual(manager.snapshot()["state"],"SUCCEEDED")
+        manager.upload_started(items); manager.expire(time.monotonic()+31); self.assertEqual(manager.snapshot()["state"],"UNKNOWN")
+        with self.assertRaises(ValueError): validate_mission([{"command":999}])
 
     def test_attitude_radians_are_normalized_to_degrees(self):
         self.normalizer.ingest(FakeMessage("ATTITUDE", {"roll": 0.5, "pitch": -0.25, "yaw": 1.0,
@@ -151,6 +425,38 @@ class TelemetryTests(unittest.TestCase):
         self.events.evaluate(self.state.snapshot())
         stored = [e for e in self.events.list_events() if e["type"] == "battery.low"]
         self.assertIsNotNone(stored[0]["ended_at"])
+
+    def test_simulated_control_responses_are_isolated_and_configurable(self):
+        sim=Simulator(self.state,self.events,self.normalizer); sim.start("normal",1)
+        with self.assertRaises(ValueError): sim.submit_control("mode",mode="UNKNOWN")
+        with self.assertRaises(ValueError): sim.submit_control("reposition",latitude=91,longitude=0,altitude=10)
+        with self.assertRaises(ValueError): sim.submit_control("parameter_set",name="SIM_FAILSAFE",value=1.5)
+        with self.assertRaises(ValueError): sim.submit_control("mission_upload",items=[{"command":999}])
+        sim.set_control_behavior("rejected"); sim.submit_control("arm"); sim._process_control()
+        self.assertEqual(sim.control_status()["transactions"][0]["state"],"FAILED")
+        self.assertFalse(sim._armed)
+        sim.set_control_behavior("accepted"); sim.submit_control("arm"); sim._process_control()
+        self.assertEqual(sim.control_status()["transactions"][0]["state"],"SUCCEEDED")
+        self.assertTrue(sim._armed)
+        sim.set_control_behavior("missing_ack"); sim.submit_control("mode",mode="RTL"); sim._process_control()
+        self.assertEqual(sim.control_status()["transactions"][0]["state"],"UNKNOWN")
+        self.assertEqual(sim._mode,"GUIDED")
+        sim.set_control_behavior("accepted"); sim.submit_control("parameter_set",name="SIM_RATE",value=25); sim._process_control()
+        self.assertEqual(sim._sim_parameters["SIM_RATE"],25)
+        sim.submit_control("mission_upload",items=[{"seq":0,"command":16}]); sim._process_control()
+        self.assertEqual(len(sim._sim_mission),1)
+        sim.set_control_behavior("rejected"); sim.submit_control("mission_upload",items=[]); sim._process_control()
+        self.assertEqual(sim._sim_mission[0]["seq"],0)
+        sim.set_control_behavior("delayed"); sim.submit_control("mode",mode="RTL")
+        started=time.monotonic(); sim._process_control()
+        self.assertLess(time.monotonic()-started,0.05)
+        self.assertEqual(sim.control_status()["transactions"][0]["state"],"WAITING_ACK")
+        time.sleep(.45); sim._process_control()
+        self.assertEqual(sim.control_status()["transactions"][0]["state"],"SUCCEEDED")
+        sim.set_control_behavior("disconnect"); sim.submit_control("speed",speed=2); sim._process_control()
+        self.assertGreater(sim._control_link_lost_until,time.monotonic())
+        self.assertEqual(sim.control_status()["transactions"][0]["state"],"CANCELLED")
+        sim.stop()
 
     def test_simulator_uses_mavlink_normalizer_and_exercises_rules(self):
         sim = Simulator(self.state, self.events, self.normalizer)
