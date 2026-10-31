@@ -30,16 +30,11 @@ from .state import VehicleState
 from .store import Store, now_iso
 from .telemetry import TelemetryNormalizer
 
-store = Store()
-vehicle_state = VehicleState()
-events = EventEngine(store)
-normalizer = TelemetryNormalizer(vehicle_state, events)
-simulator = Simulator(vehicle_state, events, normalizer)
-mavlink = MavlinkManager(vehicle_state, events, normalizer)
-analyzer = LogAnalyzer(store)
-recorder = TelemetryRecorder(store, vehicle_state)
+from .main import store, vehicle_state, events, normalizer, simulator, mavlink, analyzer, recorder
+from .workflows import GET_ROUTES, POST_ROUTES, vehicle_mutation
 STATIC = ROOT / "frontend" / "static"
 ASSETS = {"app.js": "text/javascript", "styles.css": "text/css"}
+ASSETS.update({'workflows.js':'text/javascript','planner.js':'text/javascript','workflows.css':'text/css','vendor/leaflet.js':'text/javascript','vendor/leaflet.css':'text/css','vendor/LICENSE':'text/plain'})
 
 
 @asynccontextmanager
@@ -49,6 +44,25 @@ async def lifespan(_app):
 
 
 app = FastAPI(title="AeroScope", version="0.1.0", docs_url="/api/docs", redoc_url=None, lifespan=lifespan)
+
+@app.middleware('http')
+async def workflows_transport(request, call_next):
+    path=request.url.path
+    try:
+        if request.method=='GET' and path in GET_ROUTES:
+            return JSONResponse(await asyncio.to_thread(mavlink.workflows.dispatch,'GET',path,{},None))
+        if request.method=='POST':
+            same_origin(request); client=request.headers.get('X-AeroScope-Client')
+            if path in POST_ROUTES:
+                raw=await request.body()
+                if len(raw)>65536: raise ValueError('Request exceeds 64 KiB')
+                return JSONResponse(await asyncio.to_thread(mavlink.workflows.dispatch,'POST',path,request_object(raw),client))
+            if vehicle_mutation(path): mavlink.workflows.require_owner(client)
+        return await call_next(request)
+    except (ValueError,RuntimeError) as exc:
+        return JSONResponse({'error':str(exc),'code':'operation_unavailable'},status_code=409 if isinstance(exc,RuntimeError) else 400)
+    except HTTPException as exc:
+        return JSONResponse({'error':str(exc.detail)},status_code=exc.status_code)
 
 
 def same_origin(request: Request) -> None:
@@ -64,10 +78,18 @@ def request_object(raw: bytes) -> dict:
     return value
 
 
+def service_error(exc: Exception) -> HTTPException:
+    """Keep service validation and unavailable-session errors consistent with stdlib HTTP."""
+    return HTTPException(409 if isinstance(exc, RuntimeError) else 400, str(exc))
+
+
 @app.get("/")
 def index():
     return FileResponse(STATIC / "index.html", media_type="text/html", headers={"Cache-Control":"no-store"})
 
+
+@app.get('/vendor/{name}')
+def vendor_asset(name: str): return asset('vendor/'+name)
 
 @app.get("/{asset}")
 def asset(asset: str):
@@ -81,6 +103,61 @@ def health(): return {"status":"ok","product":"AeroScope","version":"0.1.0","pro
 
 @app.get("/api/state")
 def get_state(): return {"protocol_version":1,"data":vehicle_state.snapshot(),"simulation":simulator.status(),"mavlink":mavlink.status()}
+
+
+@app.get("/api/control/status")
+def control_status(): return {"protocol_version":1,"connection":mavlink.status(),"transactions":mavlink.transactions.list()}
+
+
+@app.get("/api/control/capabilities")
+def control_capabilities(): return {"protocol_version":1,"capabilities":mavlink.capabilities()}
+
+
+@app.get("/api/control/mode")
+def control_mode(): return {"protocol_version":1,"current":vehicle_state.snapshot()["status"]["flight_mode"],"request":mavlink.mode_status()}
+
+
+@app.post("/api/control/mode")
+async def set_control_mode(request: Request):
+    same_origin(request); body=request_object(await request.body())
+    try: return JSONResponse({"request":mavlink.request_mode(str(body.get("mode", "")),confirmed=body.get("confirmed") is True)},status_code=202)
+    except (ValueError,RuntimeError) as exc: raise service_error(exc) from exc
+
+
+@app.get("/api/control/arm")
+def control_arm(): return {"protocol_version":1,"armed":vehicle_state.snapshot()["status"]["armed"],"request":mavlink.arm_status()}
+
+
+@app.post("/api/control/arm")
+async def set_control_arm(request: Request):
+    same_origin(request); body=request_object(await request.body())
+    try: return JSONResponse({"request":mavlink.request_arm(body.get("armed"),confirmation=str(body.get("confirmation", "")),acknowledge_unknown=body.get("acknowledge_unknown") is True)},status_code=202)
+    except (ValueError,RuntimeError) as exc: raise service_error(exc) from exc
+
+
+@app.get("/api/parameters")
+def get_parameters(search: str = ""): return {"protocol_version":1,**mavlink.parameters.snapshot(search)}
+
+
+@app.post("/api/parameters/request")
+async def request_parameters(request: Request):
+    same_origin(request)
+    try: mavlink.request_parameters(); return JSONResponse({"accepted":True},status_code=202)
+    except RuntimeError as exc: raise service_error(exc) from exc
+
+
+@app.post("/api/parameters/refresh")
+async def refresh_parameter(request: Request):
+    same_origin(request); body=request_object(await request.body())
+    try: mavlink.refresh_parameter(str(body.get("name", ""))); return JSONResponse({"accepted":True},status_code=202)
+    except (ValueError,RuntimeError) as exc: raise service_error(exc) from exc
+
+
+@app.post("/api/parameters/set")
+async def set_parameter(request: Request):
+    same_origin(request); body=request_object(await request.body())
+    try: mavlink.set_parameter(str(body.get("name", "")),body.get("value"),confirmed=body.get("confirmed") is True); return JSONResponse({"accepted":True},status_code=202)
+    except (ValueError,RuntimeError) as exc: raise service_error(exc) from exc
 
 
 @app.get("/api/events")
@@ -108,14 +185,14 @@ async def simulation(request: Request):
         elif action == "reset": simulator.reset(); result=simulator.status()
         else: raise ValueError("action must be start, stop, or reset")
         return {"simulation":result}
-    except (ValueError, TypeError) as exc: raise HTTPException(400,str(exc)) from exc
+    except (ValueError, TypeError) as exc: raise service_error(exc) from exc
 
 
 @app.post("/api/connection")
 async def connect(request: Request):
     same_origin(request); body=request_object(await request.body()); simulator.stop()
     try: return JSONResponse({"connection":mavlink.connect(body)},status_code=202)
-    except (ValueError,RuntimeError) as exc: raise HTTPException(400,str(exc)) from exc
+    except (ValueError,RuntimeError) as exc: raise service_error(exc) from exc
 
 
 @app.post("/api/connection/disconnect")
@@ -124,6 +201,89 @@ async def disconnect(request: Request):
     return {"connection":mavlink.status(),"data":vehicle_state.snapshot()}
 
 
+@app.get("/api/parameters/snapshots")
+def parameter_snapshots(): return {"snapshots":store.list_parameter_snapshots()}
+
+@app.post("/api/parameters/snapshot")
+async def save_parameter_snapshot(request: Request):
+    same_origin(request); body=request_object(await request.body()); params=mavlink.parameters.snapshot()["parameters"]
+    if not params: raise HTTPException(400,"No downloaded parameters to snapshot")
+    return JSONResponse({"snapshot":store.save_parameter_snapshot(str(body.get("name","")),params)},status_code=201)
+
+@app.get("/api/parameters/compare")
+def compare_parameters(left: str, right: str):
+    a=store.get_parameter_snapshot(left); b=store.get_parameter_snapshot(right)
+    if not a or not b: raise HTTPException(400,"Both valid snapshot IDs are required")
+    from .parameters import compare_parameter_snapshots
+    return {"changes":compare_parameter_snapshots(a["parameters"],b["parameters"])}
+
+@app.get("/api/parameters/export")
+def export_parameters(format: str = "json"):
+    rows=mavlink.parameters.snapshot()["parameters"]
+    if format=="json": return {"parameters":rows}
+    if format!="csv": raise HTTPException(400,"format must be json or csv")
+    out=io.StringIO(newline=""); writer=csv.DictWriter(out,fieldnames=["name","value","type","index","count","received_at"]); writer.writeheader(); writer.writerows(rows)
+    return Response(out.getvalue(),media_type="text/csv",headers={"Content-Disposition":"attachment; filename=aeroscope-parameters.csv"})
+@app.get("/api/simulation/control")
+def simulation_control_status(): return {"control":simulator.control_status()}
+
+@app.post("/api/simulation/control")
+async def simulation_control(request: Request):
+    same_origin(request); body=request_object(await request.body())
+    try:
+        if body.get("behavior") is not None: simulator.set_control_behavior(str(body["behavior"]))
+        if body.get("operation") is not None:
+            params=body.get("params",{})
+            if not isinstance(params,dict): raise ValueError("params must be an object")
+            result=simulator.submit_control(str(body["operation"]),**params)
+        else: result=simulator.control_status()
+        return JSONResponse({"control":result},status_code=202)
+    except (ValueError,RuntimeError,TypeError) as exc: raise service_error(exc) from exc
+@app.get("/api/mission")
+def get_mission(): return {"protocol_version":1,**mavlink.missions.snapshot()}
+
+@app.post("/api/mission/download")
+async def download_mission(request: Request):
+    same_origin(request)
+    try:
+        mavlink.request_mission_download()
+        return JSONResponse({"accepted":True},status_code=202)
+    except RuntimeError as exc: raise service_error(exc) from exc
+
+@app.post("/api/mission/upload")
+async def upload_mission(request: Request):
+    same_origin(request); body=request_object(await request.body())
+    try: return JSONResponse({"mission":mavlink.upload_mission(body.get("items"),confirmed=body.get("confirmed") is True)},status_code=202)
+    except (ValueError,RuntimeError) as exc: raise service_error(exc) from exc
+@app.post("/api/mission/clear")
+async def clear_mission(request: Request):
+    same_origin(request); body=request_object(await request.body())
+    try: return JSONResponse({"mission":mavlink.clear_mission(confirmed=body.get("confirmed") is True)},status_code=202)
+    except (ValueError,RuntimeError) as exc: raise service_error(exc) from exc
+@app.post("/api/guided/reposition")
+async def guided_reposition(request: Request):
+    same_origin(request); body=request_object(await request.body())
+    try:
+        tx=mavlink.guided_reposition(body.get("latitude"),body.get("longitude"),body.get("altitude"),body.get("speed",-1),confirmation=str(body.get("confirmation","")),acknowledge_unknown=body.get("acknowledge_unknown") is True)
+        return JSONResponse({"transaction":tx},status_code=202)
+    except (ValueError,RuntimeError,TypeError) as exc: raise service_error(exc) from exc
+@app.post("/api/guided/takeoff")
+async def guided_takeoff(request: Request):
+    same_origin(request); body=request_object(await request.body())
+    try: return JSONResponse({"transaction":mavlink.guided_takeoff(body.get("altitude"),confirmation=str(body.get("confirmation","")),acknowledge_unknown=body.get("acknowledge_unknown") is True)},status_code=202)
+    except (ValueError,RuntimeError,TypeError) as exc: raise service_error(exc) from exc
+
+@app.post("/api/guided/land")
+async def guided_land(request: Request):
+    same_origin(request); body=request_object(await request.body())
+    try: return JSONResponse({"transaction":mavlink.guided_land(confirmation=str(body.get("confirmation","")),acknowledge_unknown=body.get("acknowledge_unknown") is True)},status_code=202)
+    except (ValueError,RuntimeError,TypeError) as exc: raise service_error(exc) from exc
+
+@app.post("/api/guided/speed")
+async def guided_speed(request: Request):
+    same_origin(request); body=request_object(await request.body())
+    try: return JSONResponse({"transaction":mavlink.guided_speed(body.get("speed"),confirmation=str(body.get("confirmation","")),acknowledge_unknown=body.get("acknowledge_unknown") is True)},status_code=202)
+    except (ValueError,RuntimeError,TypeError) as exc: raise service_error(exc) from exc
 @app.get("/api/profiles")
 def profiles(): return {"profiles":store.list_profiles()}
 
@@ -260,6 +420,7 @@ async def stream(websocket: WebSocket, path: str):
         while True:
             if path=="telemetry": data=vehicle_state.snapshot()
             elif path=="connection": data=vehicle_state.snapshot()["connection"]
+            elif path=="control": data={"connection":mavlink.status(),"transactions":mavlink.transactions.list()}
             else: data={"events":events.list_events(30)}
             packet={"protocol_version":1,"type":path,"sent_at":now_iso(),"data":data}
             await asyncio.wait_for(websocket.send_json(packet),timeout=1.0)
@@ -279,6 +440,10 @@ async def ws_events(websocket: WebSocket): await stream(websocket,"events")
 
 @app.websocket("/ws/connection")
 async def ws_connection(websocket: WebSocket): await stream(websocket,"connection")
+
+
+@app.websocket("/ws/control")
+async def ws_control(websocket: WebSocket): await stream(websocket,"control")
 
 
 def run() -> None:

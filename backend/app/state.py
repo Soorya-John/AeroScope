@@ -22,6 +22,7 @@ def initial_state() -> dict[str, Any]:
     return {
         "protocol_version": PROTOCOL_VERSION,
         "vehicle": {"name": "Vehicle 1", "type": field(), "autopilot": field(), "firmware": field(),
+                    "firmware_details": {}, "protocol_capabilities": field(), "mavlink_version": field(),
                     "system_id": field(), "component_id": field(), "simulated": False},
         "connection": {"state": "disconnected", "transport": None, "message": "No vehicle connected",
                        "connected_since": None, "last_heartbeat": None, "last_update": None,

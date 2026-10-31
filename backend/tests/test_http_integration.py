@@ -9,9 +9,10 @@ import time
 import unittest
 from pathlib import Path
 from urllib.request import Request, urlopen
+from urllib.error import HTTPError
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from app.main import AeroScopeServer, Handler, simulator, mavlink
+from app.main import AeroScopeServer, Handler, simulator, mavlink, vehicle_state
 
 
 def get_json(url: str):
@@ -82,11 +83,23 @@ class HttpWorkflowTests(unittest.TestCase):
         self.assertEqual(status, 200)
         self.assertEqual(content_type, "text/html")
         self.assertIn(b"Mission overview", html)
+        self.assertIn(b"SIMULATOR ONLY", html)
         health = json.loads(get_json(self.base + "/api/health")[2])
         state = json.loads(get_json(self.base + "/api/state")[2])["data"]
         self.assertEqual(health["status"], "ok")
         self.assertEqual(state["connection"]["state"], "disconnected")
         self.assertFalse(state["gps"]["fix_type"]["available"])
+
+    def test_control_service_unavailable_is_a_conflict_not_server_error(self):
+        with self.assertRaises(HTTPError) as err:
+            post_json(self.base+"/api/parameters/request",{})
+        self.assertEqual(err.exception.code,409)
+        payload=json.loads(err.exception.read())
+        self.assertEqual(payload["code"],"operation_unavailable")
+
+    def setUp(self):
+        simulator.stop(); mavlink.disconnect(); vehicle_state.reset()
+        mavlink.workflows.owner=None
 
     def test_simulation_stream_and_graceful_stop(self):
         status, started = post_json(self.base + "/api/simulation", {"action":"start", "scenario":"normal", "speed":1})
@@ -121,6 +134,23 @@ class HttpWorkflowTests(unittest.TestCase):
         finally:
             first_sock.close(); first_stream.close(); second_sock.close(); second_stream.close()
             post_json(self.base + "/api/simulation", {"action":"stop"})
+
+    def test_control_api_isolation_and_parameter_snapshot_endpoints(self):
+        post_json(self.base+"/api/simulation",{"action":"start","scenario":"normal","speed":1})
+        try:
+            _,accepted=post_json(self.base+"/api/simulation/control",{"operation":"parameter_download"})
+            self.assertEqual(accepted["control"]["kind"],"parameter_download")
+            _,rejected=post_json(self.base+"/api/simulation/control",{"behavior":"rejected","operation":"mission_upload","params":{"items":[]}})
+            time.sleep(.25)
+            status,_,body=get_json(self.base+"/api/simulation/control")
+            self.assertEqual(status,200)
+            self.assertEqual(json.loads(body)["control"]["behavior"],"rejected")
+            self.assertFalse(mavlink.status()["running"])
+            with self.assertRaises(HTTPError) as err:
+                post_json(self.base+"/api/mission/upload",{"items":[],"confirmed":False})
+            self.assertEqual(err.exception.code,400)
+        finally:
+            post_json(self.base+"/api/simulation",{"action":"stop"})
 
 
 if __name__ == "__main__":

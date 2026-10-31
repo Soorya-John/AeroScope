@@ -65,6 +65,9 @@ class Store:
                     id TEXT PRIMARY KEY, name TEXT NOT NULL, stored_name TEXT NOT NULL,
                     started_at TEXT NOT NULL, ended_at TEXT, sample_count INTEGER NOT NULL DEFAULT 0
                 );
+                CREATE TABLE IF NOT EXISTS parameter_snapshots (
+                    id TEXT PRIMARY KEY, name TEXT NOT NULL, created_at TEXT NOT NULL, parameters_json TEXT NOT NULL
+                );
             """)
 
     def add_event(self, event: dict[str, Any]) -> None:
@@ -168,3 +171,21 @@ class Store:
         with self._connect() as db:
             rows = db.execute("SELECT id,name,started_at,ended_at,sample_count FROM recordings ORDER BY started_at DESC LIMIT 100").fetchall()
         return [dict(r) for r in rows]
+
+    def save_parameter_snapshot(self, name: str, parameters: list[dict[str, Any]]) -> dict[str, Any]:
+        snapshot={"id":str(uuid.uuid4()),"name":name.strip()[:100] or "Parameter snapshot","created_at":now_iso(),"parameters":parameters}
+        with self._connect() as db:
+            db.execute("INSERT INTO parameter_snapshots(id,name,created_at,parameters_json) VALUES(?,?,?,?)",
+                       (snapshot["id"],snapshot["name"],snapshot["created_at"],json.dumps(parameters)))
+        return snapshot
+
+    def list_parameter_snapshots(self) -> list[dict[str, Any]]:
+        with self._connect() as db:
+            rows=db.execute("SELECT id,name,created_at FROM parameter_snapshots ORDER BY created_at DESC LIMIT 100").fetchall()
+        return [dict(r) for r in rows]
+
+    def get_parameter_snapshot(self, snapshot_id: str) -> dict[str, Any] | None:
+        with self._connect() as db:
+            row=db.execute("SELECT id,name,created_at,parameters_json FROM parameter_snapshots WHERE id=?",(snapshot_id,)).fetchone()
+        if row is None:return None
+        result=dict(row); result["parameters"]=json.loads(result.pop("parameters_json")); return result

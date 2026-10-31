@@ -27,6 +27,7 @@ from .simulator import SCENARIOS, Simulator
 from .state import VehicleState
 from .store import Store, now_iso
 from .telemetry import TelemetryNormalizer
+from .workflows import GET_ROUTES, POST_ROUTES, vehicle_mutation
 
 logging.basicConfig(level=os.environ.get("AEROSCOPE_LOG_LEVEL", "INFO"), format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("aeroscope")
@@ -45,6 +46,8 @@ STATIC_FILES = {"/": ("index.html", "text/html; charset=utf-8"),
                 "/index.html": ("index.html", "text/html; charset=utf-8"),
                 "/app.js": ("app.js", "text/javascript; charset=utf-8"),
                 "/styles.css": ("styles.css", "text/css; charset=utf-8")}
+for asset, content_type in {'workflows.js':'text/javascript','planner.js':'text/javascript','workflows.css':'text/css','vendor/leaflet.js':'text/javascript','vendor/leaflet.css':'text/css','vendor/LICENSE':'text/plain'}.items():
+    STATIC_FILES['/'+asset]=(asset,content_type+'; charset=utf-8')
 
 
 def _json_bytes(value: Any) -> bytes:
@@ -136,7 +139,7 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "no-store")
         self.send_header("X-Content-Type-Options", "nosniff")
         self.send_header("Referrer-Policy", "no-referrer")
-        self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' ws: wss:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'")
+        self.send_header("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://tile.openstreetmap.org; connect-src 'self' ws: wss:; object-src 'none'; base-uri 'self'; frame-ancestors 'none'")
 
     def _send_json(self, status: int, payload: Any) -> None:
         body = _json_bytes(payload)
@@ -184,6 +187,10 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         url = urlsplit(self.path)
         path = url.path
+        if path in {"/api/setup","/api/control/ownership","/api/parameters/batch","/api/connection/ports"}:
+            try: self._send_json(200,mavlink.workflows.dispatch('GET',path,{},None))
+            except (ValueError,RuntimeError,ImportError) as exc: self._send_json(409,{'error':str(exc)})
+            return
         if path.startswith("/ws/"):
             self._websocket(path)
             return
@@ -203,6 +210,37 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json(200, {"status": "ok", "product": "AeroScope", "version": "0.1.0", "protocol_version": 1, "time": now_iso()})
             elif path == "/api/state":
                 self._send_json(200, {"protocol_version": 1, "data": vehicle_state.snapshot(), "simulation": simulator.status(), "mavlink": mavlink.status()})
+            elif path == "/api/control/status":
+                self._send_json(200, {"protocol_version": 1, "connection": mavlink.status(), "transactions": mavlink.transactions.list()})
+            elif path == "/api/control/capabilities":
+                self._send_json(200, {"protocol_version": 1, "capabilities": mavlink.capabilities()})
+            elif path == "/api/control/mode":
+                self._send_json(200, {"protocol_version": 1, "current": vehicle_state.snapshot()["status"]["flight_mode"], "request": mavlink.mode_status()})
+            elif path == "/api/control/arm":
+                self._send_json(200, {"protocol_version": 1, "armed": vehicle_state.snapshot()["status"]["armed"], "request": mavlink.arm_status()})
+            elif path == "/api/parameters":
+                self._send_json(200, {"protocol_version": 1, **mavlink.parameters.snapshot(str(query.get("search", [""])[0]))})
+            elif path == "/api/parameters/snapshots":
+                self._send_json(200,{"snapshots":store.list_parameter_snapshots()})
+            elif path == "/api/parameters/compare":
+                left=store.get_parameter_snapshot(str(query.get("left",[""])[0])); right=store.get_parameter_snapshot(str(query.get("right",[""])[0]))
+                if not left or not right: raise ValueError("Both valid snapshot IDs are required")
+                from .parameters import compare_parameter_snapshots
+                self._send_json(200,{"changes":compare_parameter_snapshots(left["parameters"],right["parameters"])})
+            elif path == "/api/parameters/export":
+                rows=mavlink.parameters.snapshot()["parameters"]; fmt=query.get("format",["json"])[0]
+                if fmt=="json": self._send_json(200,{"parameters":rows}); return
+                if fmt!="csv": raise ValueError("format must be json or csv")
+                out=io.StringIO(newline=""); writer=csv.DictWriter(out,fieldnames=["name","value","type","index","count","received_at"],extrasaction='ignore'); writer.writeheader(); writer.writerows(rows)
+                self._send_bytes(200,out.getvalue().encode(),"text/csv; charset=utf-8")
+            elif path == "/api/mission":
+                self._send_json(200, {"protocol_version": 1, **mavlink.missions.snapshot()})
+            elif path == "/api/simulation/control":
+                self._send_json(200,{"control":simulator.control_status()})
+            elif path == "/api/guided/reposition":
+                self._send_json(200,{"transaction":mavlink.transactions.list()[:20]})
+            elif path in ("/api/guided/takeoff","/api/guided/land","/api/guided/speed"):
+                self._send_json(200,{"transactions":mavlink.transactions.list()[:20]})
             elif path == "/api/events":
                 self._send_json(200, {"events": events.list_events(int(query.get("limit", ["100"])[0]))})
             elif path == "/api/inspector":
@@ -239,7 +277,54 @@ class Handler(BaseHTTPRequestHandler):
             return
         path = urlsplit(self.path).path
         try:
-            if path == "/api/simulation":
+            client=self.headers.get('X-AeroScope-Client')
+            if path in POST_ROUTES:
+                self._send_json(200,mavlink.workflows.dispatch('POST',path,self._json_body(),client)); return
+            if vehicle_mutation(path): mavlink.workflows.require_owner(client)
+            if path == "/api/control/mode":
+                body = self._json_body()
+                request = mavlink.request_mode(str(body.get("mode", "")), confirmed=body.get("confirmed") is True)
+                self._send_json(202, {"request": request})
+            elif path == "/api/control/arm":
+                body = self._json_body()
+                request = mavlink.request_arm(body.get("armed"), confirmation=str(body.get("confirmation", "")), acknowledge_unknown=body.get("acknowledge_unknown") is True)
+                self._send_json(202, {"request": request})
+            elif path == "/api/parameters/request":
+                mavlink.request_parameters(); self._send_json(202, {"accepted": True})
+            elif path == "/api/parameters/refresh":
+                mavlink.refresh_parameter(str(self._json_body().get("name", ""))); self._send_json(202, {"accepted": True})
+            elif path == "/api/parameters/set":
+                body=self._json_body(); mavlink.set_parameter(str(body.get("name", "")),body.get("value"),confirmed=body.get("confirmed") is True)
+                self._send_json(202, {"accepted": True})
+            elif path == "/api/parameters/snapshot":
+                body=self._json_body(); params=mavlink.parameters.snapshot()["parameters"]
+                if not params: raise ValueError("No downloaded parameters to snapshot")
+                self._send_json(201,{"snapshot":store.save_parameter_snapshot(str(body.get("name","")),params)})
+            elif path == "/api/mission/download":
+                mavlink.request_mission_download(); self._send_json(202, {"accepted": True})
+            elif path == "/api/mission/upload":
+                body=self._json_body(); mission=mavlink.upload_mission(body.get("items"),confirmed=body.get("confirmed") is True)
+                self._send_json(202, {"mission":mission})
+            elif path == "/api/simulation/control":
+                body=self._json_body()
+                if body.get("behavior") is not None: simulator.set_control_behavior(str(body["behavior"]))
+                if body.get("operation") is not None:
+                    params=body.get("params",{}); result=simulator.submit_control(str(body["operation"]),**(params if isinstance(params,dict) else {}))
+                else: result=simulator.control_status()
+                self._send_json(202,{"control":result})
+            elif path == "/api/mission/clear":
+                body=self._json_body(); self._send_json(202,{"mission":mavlink.clear_mission(confirmed=body.get("confirmed") is True)})
+            elif path == "/api/guided/reposition":
+                body=self._json_body(); tx=mavlink.guided_reposition(body.get("latitude"),body.get("longitude"),body.get("altitude"),body.get("speed",-1),confirmation=str(body.get("confirmation","")),acknowledge_unknown=body.get("acknowledge_unknown") is True)
+                self._send_json(202,{"transaction":tx})
+            elif path in ("/api/guided/takeoff","/api/guided/land","/api/guided/speed"):
+                body=self._json_body(); confirm=str(body.get("confirmation",""))
+                unknown=body.get("acknowledge_unknown") is True
+                if path.endswith("takeoff"): tx=mavlink.guided_takeoff(body.get("altitude"),confirmation=confirm,acknowledge_unknown=unknown)
+                elif path.endswith("land"): tx=mavlink.guided_land(confirmation=confirm,acknowledge_unknown=unknown)
+                else: tx=mavlink.guided_speed(body.get("speed"),confirmation=confirm,acknowledge_unknown=unknown)
+                self._send_json(202,{"transaction":tx})
+            elif path == "/api/simulation":
                 body = self._json_body()
                 action = body.get("action")
                 if action == "start":
@@ -297,9 +382,11 @@ class Handler(BaseHTTPRequestHandler):
                 self._send_json(404, {"error": "Route not found"})
         except (ValueError, TypeError) as exc:
             self._send_json(400, {"error": str(exc)})
+        except RuntimeError as exc:
+            self._send_json(409, {"error": str(exc), "code": "operation_unavailable"})
         except Exception as exc:
             logger.exception("POST handler failed for %s", path)
-            self._send_json(500, {"error": str(exc)[:300] if isinstance(exc, RuntimeError) else "Internal server error"})
+            self._send_json(500, {"error": "Internal server error"})
 
     def do_DELETE(self) -> None:
         if not self._origin_ok():
@@ -400,7 +487,10 @@ class Handler(BaseHTTPRequestHandler):
                 now = time.monotonic()
                 if now - last_send < interval: continue
                 last_send = now
-                if path == "/ws/events":
+                if path == "/ws/control":
+                    data = {"connection": mavlink.status(), "transactions": mavlink.transactions.list()}
+                    packet = {"protocol_version": 1, "type": "control", "sent_at": now_iso(), "data": data}
+                elif path == "/ws/events":
                     packet = {"protocol_version": 1, "type": "events", "sent_at": now_iso(), "data": {"events": events.list_events(30)}}
                 elif path == "/ws/connection":
                     packet = {"protocol_version": 1, "type": "connection", "sent_at": now_iso(), "data": vehicle_state.snapshot()["connection"]}

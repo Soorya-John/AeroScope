@@ -202,6 +202,21 @@ class TelemetryNormalizer:
             version = int(_field(msg, "flight_sw_version", 0))
             packed = f"{(version >> 24)&255}.{(version >> 16)&255}.{(version >> 8)&255}.{version&255}" if version else None
             self._put("vehicle", "firmware", packed, None, stamp, packed is not None)
+            def version_text(name: str) -> str | None:
+                value=_field(msg,name,b"")
+                if isinstance(value,bytes):
+                    raw=value.split(b"\0",1)[0]
+                    return raw.hex() if raw and any(raw) else None
+                return None
+            capabilities=int(_field(msg,"capabilities",0))
+            details={"flight_version":packed,"middleware_sw_version":int(_field(msg,"middleware_sw_version",0)),
+                     "os_sw_version":int(_field(msg,"os_sw_version",0)),"board_version":int(_field(msg,"board_version",0)),
+                     "flight_custom_version":version_text("flight_custom_version"),
+                     "middleware_custom_version":version_text("middleware_custom_version"),
+                     "os_custom_version":version_text("os_custom_version"),
+                     "vendor_id":int(_field(msg,"vendor_id",0)),"product_id":int(_field(msg,"product_id",0))}
+            self.state.update_vehicle(firmware_details=details)
+            self._put("vehicle","protocol_capabilities",capabilities,None,stamp)
         elif kind == "MISSION_CURRENT":
             self._put("status", "mission_current", int(_field(msg, "seq", 0)), None, stamp)
         elif kind == "EXTENDED_SYS_STATE":

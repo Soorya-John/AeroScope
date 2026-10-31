@@ -17,6 +17,7 @@ from .parameters import (ParameterStore, validate_ext_parameter_value, validate_
                          parse_ext_parameter_value)
 from .missions import MissionManager, validate_mission
 from .firmware import parameter_encoding, encode_parameter, decode_parameter
+from .workflows import Workflows
 
 
 def validate_connection(config: dict[str, Any]) -> tuple[str, str]:
@@ -77,6 +78,7 @@ class MavlinkManager:
         self.parameters = ParameterStore()
         self.missions = MissionManager()
         self._selected_target: tuple[int, int] | None = None
+        self.workflows=Workflows(self)
 
     def status(self) -> dict[str, Any]:
         with self._lock:
@@ -85,6 +87,7 @@ class MavlinkManager:
                       "dialect": self._dialect,
                       "session_id": self._session_id, "pending_transactions": sum(
                           t["state"] in {"QUEUED", "WAITING_ACK", "IN_PROGRESS"} for t in self.transactions.list())}
+            result['environment']=(self._config or {}).get('environment','physical')
         return result
 
     def connect(self, config: dict[str, Any]) -> dict[str, Any]:
@@ -232,6 +235,7 @@ class MavlinkManager:
                         elif kind=="MISSION_CURRENT": self.missions.update_current(int(msg.seq),getattr(msg,"mission_state",None))
                         elif kind=="MISSION_ITEM_REACHED": self.missions.item_reached(int(msg.seq))
                         self.normalizer.ingest(msg)
+                        self.workflows.ingest(msg)
                         if kind=="AUTOPILOT_VERSION":
                             with self._lock:
                                 self._capabilities["version_received"]=True

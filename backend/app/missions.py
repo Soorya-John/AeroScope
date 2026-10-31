@@ -5,6 +5,7 @@ from typing import Any
 
 MAX_ITEMS=500
 SUPPORTED_GLOBAL={16,17,18,19,21,22,82}
+SUPPORTED_ACTION={20,178,206}
 
 def validate_mission(items: list[dict[str,Any]]) -> list[dict[str,Any]]:
     if not isinstance(items,list) or len(items)>MAX_ITEMS: raise ValueError(f"Mission must contain 0–{MAX_ITEMS} items")
@@ -12,8 +13,8 @@ def validate_mission(items: list[dict[str,Any]]) -> list[dict[str,Any]]:
     for seq,item in enumerate(items):
         if not isinstance(item,dict): raise ValueError(f"Mission item {seq} must be an object")
         command=int(item.get("command",16)); frame=int(item.get("frame",6))
-        if command not in SUPPORTED_GLOBAL: raise ValueError(f"Mission command {command} is not supported by this editor")
-        if frame not in {5,6}: raise ValueError(f"Mission item {seq} uses unsupported coordinate frame {frame}")
+        if command not in SUPPORTED_GLOBAL|SUPPORTED_ACTION: raise ValueError(f"Mission command {command} is not supported by this editor")
+        if frame not in ({5,6} if command in SUPPORTED_GLOBAL else {2,5,6}): raise ValueError(f"Mission item {seq} uses unsupported coordinate frame {frame}")
         lat=float(item.get("latitude",0)); lon=float(item.get("longitude",0)); alt=float(item.get("altitude",0))
         if command in {16,17,18,19,21,22,82} and (not math.isfinite(lat) or not -90<=lat<=90 or not math.isfinite(lon) or not -180<=lon<=180):
             raise ValueError(f"Mission item {seq} has invalid coordinates")
