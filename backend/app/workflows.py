@@ -150,8 +150,10 @@ class Workflows:
                 row['state']='VERIFIED'
             except Exception as exc:
                 if row['state'] in {'STAGED','REQUESTED'}: row['state']='UNKNOWN'
-                row['detail']=str(exc); batch['state']='PARTIAL_FAILURE'; return
-        batch['state']='VERIFIED'
+                row['detail']=str(exc)
+                if batch['state']!='CANCELLED':batch['state']='PARTIAL_FAILURE'
+                return
+        if batch['state']=='APPLYING':batch['state']='VERIFIED'
 
     def start_calibration(self, kind, confirmation):
         self.copter(disarmed=True)
@@ -227,7 +229,9 @@ class Workflows:
             self.m.parameters.cancel()
             if self.batch and self.batch['state']=='APPLYING': self.batch['state']='CANCELLED'
             return {'cancelled':True}
-        if path=='/api/mission/cancel': self.m.missions.cancel(); return self.m.missions.snapshot()
+        if path=='/api/mission/cancel':
+            session=self.m._active_control_session();self.m.missions.cancel()
+            self.m._outbound.put((session,{'kind':'mission_ack','result':15,'cancel':True}));return self.m.missions.snapshot()
         if path=='/api/setup/calibrate': return self.start_calibration(body.get('kind'),body.get('confirmation'))
         if path=='/api/setup/position':
             self.copter(disarmed=True); position=self.calibration.get('position')

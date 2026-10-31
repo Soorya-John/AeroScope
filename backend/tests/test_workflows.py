@@ -54,6 +54,12 @@ class WorkflowTests(unittest.TestCase):
         log.download_started(7);log.cancel()
         with self.assertRaises(RuntimeError):log.bytes()
 
+    def test_growing_log_final_packet_is_clipped_to_listed_snapshot(self):
+        log=VehicleLogs();log.begin_session('test');log.list_started()
+        log.ingest(SimpleNamespace(get_type=lambda:'LOG_ENTRY',num_logs=1,id=1,size=91,time_utc=0));log.download_started(1)
+        for offset in (0,90):log.ingest(SimpleNamespace(get_type=lambda:'LOG_DATA',id=1,ofs=offset,count=90,data=list(range(90))))
+        self.assertEqual(len(log.bytes()),91);self.assertEqual(log.bytes()[-1],0)
+
 class TransportTests(unittest.TestCase):
     def test_asgi_routes_and_shared_services(self):
         try:
@@ -69,5 +75,7 @@ class TransportTests(unittest.TestCase):
             denied=client.post('/api/connection/disconnect',json={},headers={'X-AeroScope-Client':'other'})
             self.assertEqual(denied.status_code,409)
             self.assertEqual(client.post('/api/connection/disconnect',json={},headers={'X-AeroScope-Client':'asgi-test'}).status_code,200)
+            main.mavlink.parameters.begin_session('export-test');main.mavlink.parameters.ingest('GAIN',1.5,9,0,1)
+            exported=client.get('/api/parameters/export?format=csv');self.assertEqual(exported.status_code,200);self.assertIn('GAIN',exported.text)
             bad=client.post('/api/control/claim',json={},headers={'X-AeroScope-Client':'asgi-test','Origin':'http://evil.example'})
             self.assertEqual(bad.status_code,403)

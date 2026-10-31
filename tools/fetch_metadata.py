@@ -23,7 +23,7 @@ for source,prefix in sources.items():
         name=prefix+match[1];block=match[2]
         fields=dict(re.findall(r'//\s*@([A-Za-z]+):\s*([^\n\r]*)',block))
         if not fields:continue
-        meta={'description':fields.get('Description',fields.get('DisplayName','')),'units':fields.get('Units',''),'reboot':fields.get('RebootRequired','').lower()=='true','source':url}
+        meta={'label':fields.get('DisplayName',name),'description':fields.get('Description',fields.get('DisplayName','')),'units':fields.get('Units',''),'reboot':fields.get('RebootRequired','').lower()=='true','source':url}
         if 'Range' in fields:
             try:meta['range']=[float(v) for v in fields['Range'].split()]
             except ValueError:pass
@@ -31,5 +31,5 @@ for source,prefix in sources.items():
             meta['enum']={k.strip():v.strip() for pair in fields['Values'].split(',') if ':' in pair for k,v in [pair.split(':',1)]}
         params[name]=meta
 target=root/'backend/app/metadata/arducopter-4.7.2.json';target.parent.mkdir(exist_ok=True)
-target.write_text(json.dumps({'firmware':'4.7.2.255','commit':commit,'license':'GPL-3.0-or-later','parameters':params},indent=2),encoding='utf-8')
+target.write_text(json.dumps({'firmware':'4.7.2.255','commit':commit,'license':'GPL-3.0-or-later','parameters':params},indent=2),encoding='utf-8',newline='\n')
 print('Metadata parameters:',len(params))

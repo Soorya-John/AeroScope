@@ -8,6 +8,8 @@ from __future__ import annotations
 import asyncio
 import base64
 import json
+import csv
+import io
 import os
 import re
 import uuid
@@ -44,6 +46,10 @@ async def lifespan(_app):
 
 
 app = FastAPI(title="AeroScope", version="0.1.0", docs_url="/api/docs", redoc_url=None, lifespan=lifespan)
+
+@app.exception_handler(HTTPException)
+async def structured_error(_request,exc):
+    return JSONResponse({'error':str(exc.detail),'code':'operation_unavailable' if exc.status_code==409 else 'request_error'},status_code=exc.status_code)
 
 @app.middleware('http')
 async def workflows_transport(request, call_next):
@@ -226,7 +232,7 @@ def export_parameters(format: str = "json"):
     rows=mavlink.parameters.snapshot()["parameters"]
     if format=="json": return {"parameters":rows}
     if format!="csv": raise HTTPException(400,"format must be json or csv")
-    out=io.StringIO(newline=""); writer=csv.DictWriter(out,fieldnames=["name","value","type","index","count","received_at"]); writer.writeheader(); writer.writerows(rows)
+    out=io.StringIO(newline=""); writer=csv.DictWriter(out,fieldnames=["name","value","type","index","count","received_at"],extrasaction='ignore'); writer.writeheader(); writer.writerows(rows)
     return Response(out.getvalue(),media_type="text/csv",headers={"Content-Disposition":"attachment; filename=aeroscope-parameters.csv"})
 @app.get("/api/simulation/control")
 def simulation_control_status(): return {"control":simulator.control_status()}

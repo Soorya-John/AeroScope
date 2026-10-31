@@ -315,7 +315,7 @@ class TelemetryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"represented exactly"):
             manager.set_parameter("BIG",2**25+1)
         manager.parameters.request_all()
-        manager.parameters.ingest("WIDE",1.0,10,1,2)
+        manager.parameters.ingest("WIDE",1.0,10,0,1)
         with self.assertRaisesRegex(ValueError,"not qualified"):
             manager.set_parameter("WIDE",1.25)
         self.assertEqual(validate_ext_parameter_value("custom",11),"custom")

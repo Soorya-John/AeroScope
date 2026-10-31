@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import bisect
 import os
 import statistics
 import threading
@@ -509,7 +510,7 @@ def parse_ulog(path: Path) -> dict[str, Any]:
     except Exception as exc:
         raise ValueError(f"pyulog could not parse this ULog file: {str(exc)[:250]}") from exc
     acc = _Accumulator("ulog")
-    datasets = {dataset.name: dataset for dataset in ulog.data_list}
+    datasets = {dataset.name: dataset for dataset in ulog.data_list if dataset.multi_id==0}
     # pyulog's public dataset interface: ULog.data_list / get_dataset(name, multi_instance).
     def records(name: str):
         dataset = datasets.get(name)
@@ -527,7 +528,9 @@ def parse_ulog(path: Path) -> dict[str, Any]:
     for topic in ("vehicle_attitude", "vehicle_global_position", "vehicle_local_position", "battery_status", "vehicle_gps_position", "vehicle_status", "vehicle_land_detected", "vehicle_attitude_setpoint", "input_rc", "actuator_outputs"):
         for row in records(topic) or ():
             t = _time(row)
-            if t is not None: streams.append((t, topic, row))
+            if t is not None:
+                if len(streams)>=300_000:raise ValueError('ULog exceeds 300,000 supported timed records; split the log before analysis')
+                streams.append((t, topic, row))
     streams.sort(key=lambda item: item[0])
     if not streams:
         raise ValueError("The ULog parsed successfully but contains no supported timed datasets")
@@ -548,7 +551,10 @@ def parse_ulog(path: Path) -> dict[str, Any]:
         if topic in ("vehicle_attitude", "vehicle_attitude_setpoint"):
             if topic == "vehicle_attitude":
                 actual = attitudes.get(int(t*100))
-                desired = min(setpoints.items(), key=lambda p: abs(p[0]-int(t*100)))[1] if mode_keys else None
+                key=int(t*100); index=bisect.bisect_left(mode_keys,key)
+                candidates=mode_keys[max(0,index-1):index+1]
+                nearest=min(candidates,key=lambda x:abs(x-key)) if candidates else None
+                desired=setpoints[nearest] if nearest is not None and abs(nearest-key)<=50 else None
                 if actual:
                     att_row={"TimeUS": int(t*1_000_000), "Roll": actual[0], "Pitch": actual[1], "Yaw": actual[2]}
                     if desired: att_row.update({"DesRoll":desired[0],"DesPitch":desired[1]})

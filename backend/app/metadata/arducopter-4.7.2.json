@@ -4,12 +4,14 @@
   "license": "GPL-3.0-or-later",
   "parameters": {
     "FORMAT_VERSION": {
+      "label": "Eeprom format version number",
       "description": "This value is incremented when changes are made to the eeprom format",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "PILOT_THR_FILT": {
+      "label": "Throttle filter cutoff",
       "description": "Throttle filter cutoff (Hz) - active whenever altitude control is inactive - 0 to disable",
       "units": "Hz",
       "reboot": false,
@@ -20,18 +22,21 @@
       ]
     },
     "PILOT_THR_BHV": {
+      "label": "Throttle stick behavior",
       "description": "Bitmask containing various throttle stick options. TX with sprung throttle can set PILOT_THR_BHV to \"1\" so motor feedback when landed starts from mid-stick instead of bottom of stick.",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "GCS_PID_MASK": {
+      "label": "GCS PID tuning mask",
       "description": "bitmask of PIDs to send MAVLink PID_TUNING messages for",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "RTL_CONE_SLOPE": {
+      "label": "RTL cone slope",
       "description": "Defines a cone above home which determines maximum climb",
       "units": "",
       "reboot": false,
@@ -47,6 +52,7 @@
       }
     },
     "RTL_LOIT_TIME": {
+      "label": "RTL loiter time",
       "description": "Time (in milliseconds) to loiter above home before beginning final descent",
       "units": "ms",
       "reboot": false,
@@ -57,6 +63,7 @@
       ]
     },
     "RTL_ALT_TYPE": {
+      "label": "RTL mode altitude type",
       "description": "RTL altitude type.  Set to 1 for Terrain following during RTL and then set WP_RFND_USE=1 to use rangefinder or WP_RFND_USE=0 to use Terrain database",
       "units": "",
       "reboot": false,
@@ -67,6 +74,7 @@
       }
     },
     "FS_GCS_ENABLE": {
+      "label": "Ground Station Failsafe Enable",
       "description": "Controls whether failsafe will be invoked (and what action to take) when connection with Ground station is lost for at least 5 seconds. See FS_OPTIONS param for additional actions, or for cases allowing Mission continuation, when GCS failsafe is enabled.",
       "units": "",
       "reboot": false,
@@ -83,6 +91,7 @@
       }
     },
     "GPS_HDOP_GOOD": {
+      "label": "GPS Hdop Good",
       "description": "GPS Hdop value at or below this value represent a good position.  Used for pre-arm checks",
       "units": "",
       "reboot": false,
@@ -93,12 +102,14 @@
       ]
     },
     "SUPER_SIMPLE": {
+      "label": "Super Simple Mode",
       "description": "Bitmask to enable Super Simple mode for some flight modes. Setting this to Disabled(0) will disable Super Simple Mode. The bitmask is for flight mode switch positions",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "WP_YAW_BEHAVIOR": {
+      "label": "Yaw behaviour during missions",
       "description": "Determines how the autopilot controls the yaw during missions and RTL",
       "units": "",
       "reboot": false,
@@ -111,6 +122,7 @@
       }
     },
     "FS_THR_ENABLE": {
+      "label": "Throttle Failsafe Enable",
       "description": "The throttle failsafe allows you to configure a software failsafe activated by a setting on the throttle input channel",
       "units": "",
       "reboot": false,
@@ -127,6 +139,7 @@
       }
     },
     "FS_THR_VALUE": {
+      "label": "Throttle Failsafe Value",
       "description": "The PWM level in microseconds on channel 3 below which throttle failsafe triggers",
       "units": "PWM",
       "reboot": false,
@@ -137,6 +150,7 @@
       ]
     },
     "THR_DZ": {
+      "label": "Throttle deadzone",
       "description": "The deadzone above and below mid throttle in PWM microseconds. Used in AltHold, Loiter, PosHold flight modes",
       "units": "PWM",
       "reboot": false,
@@ -147,6 +161,7 @@
       ]
     },
     "FLTMODE1": {
+      "label": "Flight Mode 1",
       "description": "Flight mode when pwm of Flightmode channel(FLTMODE_CH) is <= 1230",
       "units": "",
       "reboot": false,
@@ -181,36 +196,42 @@
       }
     },
     "FLTMODE2": {
+      "label": "Flight Mode 2",
       "description": "Flight mode when pwm of Flightmode channel(FLTMODE_CH) is >1230, <= 1360",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "FLTMODE3": {
+      "label": "Flight Mode 3",
       "description": "Flight mode when pwm of Flightmode channel(FLTMODE_CH) is >1360, <= 1490",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "FLTMODE4": {
+      "label": "Flight Mode 4",
       "description": "Flight mode when pwm of Flightmode channel(FLTMODE_CH) is >1490, <= 1620",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "FLTMODE5": {
+      "label": "Flight Mode 5",
       "description": "Flight mode when pwm of Flightmode channel(FLTMODE_CH) is >1620, <= 1749",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "FLTMODE6": {
+      "label": "Flight Mode 6",
       "description": "Flight mode when pwm of Flightmode channel(FLTMODE_CH) is >=1750",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "FLTMODE_CH": {
+      "label": "Flightmode channel",
       "description": "RC Channel to use for flight mode control",
       "units": "",
       "reboot": false,
@@ -231,6 +252,7 @@
       }
     },
     "INITIAL_MODE": {
+      "label": "Initial flight mode",
       "description": "This selects the mode to start in on boot. This is useful for when you want to start in AUTO mode on boot without a receiver.",
       "units": "",
       "reboot": false,
@@ -263,18 +285,21 @@
       }
     },
     "SIMPLE": {
+      "label": "Simple mode bitmask",
       "description": "Bitmask which holds which flight modes use simple heading mode (eg bit 0 = 1 means Flight Mode 0 uses simple mode). The bitmask is for flightmode switch positions.",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "LOG_BITMASK": {
+      "label": "Log bitmask",
       "description": "Bitmap of what on-board log types to enable. This value is made up of the sum of each of the log types you want to be saved. It is usually best just to enable all basiclog types by setting this to 65535. Note that if you want to reduce log sizes you should consider using LOG_FILE_RATEMAX instead of disabling logging items with this parameter.",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "ESC_CALIBRATION": {
+      "label": "ESC Calibration",
       "description": "Controls whether ArduCopter will enter ESC calibration on the next restart.  Do not adjust this parameter manually.",
       "units": "",
       "reboot": false,
@@ -288,6 +313,7 @@
       }
     },
     "TUNE": {
+      "label": "Tuning Parameter",
       "description": "Selects parameter (normally a PID gain) that is being tuned with an RC transmitter's knob. The RC input channel used is assigned by setting RCx_OPTION to 219.",
       "units": "",
       "reboot": false,
@@ -333,6 +359,7 @@
       }
     },
     "FRAME_TYPE": {
+      "label": "Frame Type (+, X, V, etc)",
       "description": "Controls motor mixing for multicopters.  Not used for Tri or Traditional Helicopters.",
       "units": "",
       "reboot": true,
@@ -355,6 +382,7 @@
       }
     },
     "DISARM_DELAY": {
+      "label": "Disarm delay",
       "description": "Delay before automatic disarm in seconds after landing touchdown detection. A value of zero disables auto disarm. If Emergency Motor stop active, delay time is half this value.",
       "units": "s",
       "reboot": false,
@@ -365,6 +393,7 @@
       ]
     },
     "PHLD_BRK_RATE": {
+      "label": "PosHold braking rate",
       "description": "PosHold flight mode's rotation rate during braking in deg/sec",
       "units": "deg/s",
       "reboot": false,
@@ -375,6 +404,7 @@
       ]
     },
     "LAND_REPOSITION": {
+      "label": "Land repositioning",
       "description": "Enables user input during LAND mode, the landing phase of RTL, and auto mode landings.",
       "units": "",
       "reboot": false,
@@ -385,6 +415,7 @@
       }
     },
     "FS_EKF_ACTION": {
+      "label": "EKF Failsafe Action",
       "description": "Controls the action that will be taken when an EKF failsafe is invoked",
       "units": "",
       "reboot": false,
@@ -397,6 +428,7 @@
       }
     },
     "FS_EKF_THRESH": {
+      "label": "EKF failsafe variance threshold",
       "description": "Allows setting the maximum acceptable compass, velocity, position and height variances. Used in arming check and EKF failsafe.",
       "units": "",
       "reboot": false,
@@ -413,6 +445,7 @@
       }
     },
     "FS_CRASH_CHECK": {
+      "label": "Crash check enable",
       "description": "This enables automatic crash checking. When enabled the motors will disarm if a crash is detected.",
       "units": "",
       "reboot": false,
@@ -423,6 +456,7 @@
       }
     },
     "RC_SPEED": {
+      "label": "ESC Update Speed",
       "description": "This is the speed in Hertz that your ESCs will receive updates",
       "units": "Hz",
       "reboot": false,
@@ -433,6 +467,7 @@
       ]
     },
     "ACRO_BAL_ROLL": {
+      "label": "Acro Balance Roll",
       "description": "rate at which roll angle returns to level in acro and sport mode.  A higher value causes the vehicle to return to level faster. For helicopter sets the decay rate of the virtual flybar in the roll axis. A higher value causes faster decay of desired to actual attitude.",
       "units": "",
       "reboot": false,
@@ -443,6 +478,7 @@
       ]
     },
     "ACRO_BAL_PITCH": {
+      "label": "Acro Balance Pitch",
       "description": "rate at which pitch angle returns to level in acro and sport mode.  A higher value causes the vehicle to return to level faster. For helicopter sets the decay rate of the virtual flybar in the pitch axis. A higher value causes faster decay of desired to actual attitude.",
       "units": "",
       "reboot": false,
@@ -453,6 +489,7 @@
       ]
     },
     "ACRO_TRAINER": {
+      "label": "Acro Trainer",
       "description": "Type of trainer used in acro mode",
       "units": "",
       "reboot": false,
@@ -464,6 +501,7 @@
       }
     },
     "THROW_MOT_START": {
+      "label": "Start motors before throwing is detected",
       "description": "Used by Throw mode. Controls whether motors will run at the speed set by MOT_SPIN_MIN or will be stopped when armed and waiting for the throw.",
       "units": "",
       "reboot": false,
@@ -474,30 +512,35 @@
       }
     },
     "THROW_ALT_MIN": {
+      "label": "Throw mode minimum altitude",
       "description": "Minimum altitude above which Throw mode will detect a throw or a drop - 0 to disable the check",
       "units": "m",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "THROW_ALT_MAX": {
+      "label": "Throw mode maximum altitude",
       "description": "Maximum altitude under which Throw mode will detect a throw or a drop - 0 to disable the check",
       "units": "m",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "THROW_ALT_DCSND": {
+      "label": "Throw mode target altitude to descend",
       "description": "Target altitude to descend during a drop, (must be positive). This allows for rapidly clearing surrounding obstacles.",
       "units": "m",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "THROW_ALT_ACSND": {
+      "label": "Throw mode target altitude to ascsend",
       "description": "Target altitude to ascend during a throw upwards (must be positive). This allows for rapidly clearing surrounding obstacles.",
       "units": "m",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "WP_NAVALT_MIN": {
+      "label": "Waypoint navigation altitude minimum",
       "description": "Altitude in meters above which navigation will begin during auto takeoff",
       "units": "m",
       "reboot": false,
@@ -508,6 +551,7 @@
       ]
     },
     "THROW_NEXTMODE": {
+      "label": "Throw mode's follow up mode",
       "description": "Vehicle will switch to this mode after the throw is successfully completed.  Default is to stay in throw mode (18)",
       "units": "",
       "reboot": false,
@@ -523,6 +567,7 @@
       }
     },
     "THROW_TYPE": {
+      "label": "Type of Type",
       "description": "Used by Throw mode. Specifies whether Copter is thrown upward or dropped.",
       "units": "",
       "reboot": false,
@@ -533,6 +578,7 @@
       }
     },
     "GND_EFFECT_COMP": {
+      "label": "Ground Effect Compensation Enable/Disable",
       "description": "Ground Effect Compensation Enable/Disable",
       "units": "",
       "reboot": false,
@@ -543,12 +589,14 @@
       }
     },
     "DEV_OPTIONS": {
+      "label": "Development options",
       "description": "Bitmask of developer options. The meanings of the bit fields in this parameter may vary at any time. Developers should check the source code for current meaning",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "ACRO_THR_MID": {
+      "label": "Acro Thr Mid",
       "description": "Acro Throttle Mid",
       "units": "",
       "reboot": false,
@@ -559,6 +607,7 @@
       ]
     },
     "FRAME_CLASS": {
+      "label": "Frame Class",
       "description": "Controls major frame class for multicopter component",
       "units": "",
       "reboot": true,
@@ -585,18 +634,21 @@
       }
     },
     "TUNE_MIN": {
+      "label": "Tuning minimum",
       "description": "Transmitter Tuning minum value. The parameter being tuned will have its value set to this minimum value when the tuning knob is at its lowest position",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "TUNE_MAX": {
+      "label": "Tuning maximum",
       "description": "Transmitter Tuning maximum value. The parameter being tuned will have its value set to this maximum value when the tuning knob is at its highest position",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "FS_VIBE_ENABLE": {
+      "label": "Vibration Failsafe enable",
       "description": "This enables the vibration failsafe which will use modified altitude estimation and control during high vibrations",
       "units": "",
       "reboot": false,
@@ -607,30 +659,35 @@
       }
     },
     "FS_OPTIONS": {
+      "label": "Failsafe options bitmask",
       "description": "Bitmask of additional options for battery, radio, & GCS failsafes. 0 (default) disables all options.",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "ACRO_OPTIONS": {
+      "label": "Acro mode options",
       "description": "A range of options that can be applied to change acro mode behaviour. Air-mode enables ATC_THR_MIX_MAN at all times (air-mode has no effect on helicopters). Rate Loop Only disables the use of angle stabilization and uses angular rate stabilization only.",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "AUTO_OPTIONS": {
+      "label": "Auto mode options",
       "description": "A range of options that can be applied to change auto mode behaviour. Allow Arming allows the copter to be armed in Auto. Allow Takeoff Without Raising Throttle allows takeoff without the pilot having to raise the throttle. Ignore pilot yaw overrides the pilot's yaw stick being used while in auto.",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "GUID_OPTIONS": {
+      "label": "Guided mode options",
       "description": "Options that can be applied to change guided mode behaviour",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "FS_GCS_TIMEOUT": {
+      "label": "GCS failsafe timeout",
       "description": "Timeout before triggering the GCS failsafe",
       "units": "s",
       "reboot": false,
@@ -641,18 +698,21 @@
       ]
     },
     "RTL_OPTIONS": {
+      "label": "RTL mode options",
       "description": "Options that can be applied to change RTL mode behaviour",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "FLIGHT_OPTIONS": {
+      "label": "Flight mode options",
       "description": "Flight mode specific options",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "RNGFND_FILT": {
+      "label": "Rangefinder filter",
       "description": "Rangefinder filter to smooth distance.  Set to zero to disable filtering",
       "units": "Hz",
       "reboot": true,
@@ -663,6 +723,7 @@
       ]
     },
     "GUID_TIMEOUT": {
+      "label": "Guided mode timeout",
       "description": "Guided mode timeout after which vehicle will stop or return to level if no updates are received from caller. Only applicable during any combination of velocity, acceleration, angle control, and/or angular rate control",
       "units": "s",
       "reboot": false,
@@ -673,6 +734,7 @@
       ]
     },
     "SURFTRAK_MODE": {
+      "label": "Surface Tracking Mode",
       "description": "set which surface to track in surface tracking",
       "units": "",
       "reboot": true,
@@ -684,6 +746,7 @@
       }
     },
     "FS_DR_ENABLE": {
+      "label": "DeadReckon Failsafe Action",
       "description": "Failsafe action taken immediately as deadreckoning starts. Deadreckoning starts when EKF loses position and velocity source and relies only on wind estimates",
       "units": "",
       "reboot": false,
@@ -698,6 +761,7 @@
       }
     },
     "FS_DR_TIMEOUT": {
+      "label": "DeadReckon Failsafe Timeout",
       "description": "DeadReckoning is available for this many seconds after losing position and/or velocity source.  After this timeout elapses the EKF failsafe will trigger in modes requiring a position estimate",
       "units": "",
       "reboot": false,
@@ -708,6 +772,7 @@
       ]
     },
     "ACRO_RP_RATE": {
+      "label": "Acro roll/pitch rate control input time constant",
       "description": "Acro roll and pitch rate control input time constant.  Low numbers lead to sharper response, higher numbers to softer response",
       "units": "s",
       "reboot": false,
@@ -725,6 +790,7 @@
       }
     },
     "ACRO_Y_RATE": {
+      "label": "Acro yaw rate control input time constant",
       "description": "Acro yaw rate control input time constant.  Low numbers lead to sharper response, higher numbers to softer response",
       "units": "s",
       "reboot": false,
@@ -742,6 +808,7 @@
       }
     },
     "PILOT_Y_RATE": {
+      "label": "Pilot yaw rate control input time constant",
       "description": "Pilot yaw rate control input time constant.  Low numbers lead to sharper response, higher numbers to softer response",
       "units": "s",
       "reboot": false,
@@ -759,6 +826,7 @@
       }
     },
     "TKOFF_SLEW_TIME": {
+      "label": "Slew time of throttle during take-off",
       "description": "Time to slew the throttle from minimum to maximum while checking for a successful takeoff.",
       "units": "s",
       "reboot": false,
@@ -769,6 +837,7 @@
       ]
     },
     "TKOFF_RPM_MIN": {
+      "label": "Takeoff Check RPM minimum",
       "description": "Takeoff is not permitted until motors report at least this RPM.  Set to zero to disable check",
       "units": "",
       "reboot": false,
@@ -779,6 +848,7 @@
       ]
     },
     "PLDP_THRESH": {
+      "label": "Payload Place thrust ratio threshold",
       "description": "Ratio of vertical thrust during decent below which payload touchdown will trigger.",
       "units": "",
       "reboot": false,
@@ -789,6 +859,7 @@
       ]
     },
     "PLDP_RNG_MAX": {
+      "label": "Payload Place maximum range finder altitude",
       "description": "Maximum range finder altitude in m to trigger payload touchdown, set to zero to disable.",
       "units": "m",
       "reboot": false,
@@ -799,6 +870,7 @@
       ]
     },
     "PLDP_DELAY": {
+      "label": "Payload Place climb delay",
       "description": "Delay after release, in seconds, before aircraft starts to climb back to starting altitude.",
       "units": "s",
       "reboot": false,
@@ -809,6 +881,7 @@
       ]
     },
     "PLDP_SPEED_DN": {
+      "label": "Payload Place decent speed",
       "description": "The maximum vertical decent velocity in m/s. If 0 LAND_SPD_MS value is used.",
       "units": "m/s",
       "reboot": false,
@@ -819,6 +892,7 @@
       ]
     },
     "SURFTRAK_TC": {
+      "label": "Surface Tracking Filter Time Constant",
       "description": "Time to achieve 63.2% of the surface altitude measurement change.  If 0 filtering is disabled",
       "units": "s",
       "reboot": false,
@@ -829,6 +903,7 @@
       ]
     },
     "TKOFF_THR_MAX": {
+      "label": "Takeoff maximum throttle during take-off ramp up",
       "description": "Takeoff maximum throttle allowed before controllers assume the aircraft is airborne during the takeoff process.",
       "units": "",
       "reboot": false,
@@ -839,6 +914,7 @@
       ]
     },
     "TKOFF_RPM_MAX": {
+      "label": "Takeoff Check RPM maximum",
       "description": "Takeoff is not permitted until motors report no more than this RPM.  Set to zero to disable check",
       "units": "",
       "reboot": false,
@@ -849,6 +925,7 @@
       ]
     },
     "FS_EKF_FILT": {
+      "label": "EKF Failsafe filter cutoff",
       "description": "EKF Failsafe filter cutoff frequency. EKF variances are filtered using this value to avoid spurious failsafes from transient high variances. A higher value means the failsafe is more likely to trigger.",
       "units": "Hz",
       "reboot": false,
@@ -859,6 +936,7 @@
       ]
     },
     "FSTRATE_ENABLE": {
+      "label": "Enable the fast Rate thread",
       "description": "Enable the fast Rate thread. In the default case the fast rate divisor, which controls the update frequency of the thread, is dynamically scaled from FSTRATE_DIV to avoid overrun in the gyro sample buffer and main loop slow-downs. Other values can be selected to fix the divisor to FSTRATE_DIV on arming or always.",
       "units": "",
       "reboot": false,
@@ -871,6 +949,7 @@
       }
     },
     "FSTRATE_DIV": {
+      "label": "Fast rate thread divisor",
       "description": "Fast rate thread divisor used to control the maximum fast rate update rate. The actual rate is the gyro rate in Hz divided by this value. This value is scaled depending on the configuration of FSTRATE_ENABLE.",
       "units": "",
       "reboot": false,
@@ -881,24 +960,28 @@
       ]
     },
     "TUNE2_MIN": {
+      "label": "Tuning minimum",
       "description": "Minimum value that the parameter currently being tuned with the transmitter's TRANSMITTER_TUNING2 knob will be set to",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "TUNE2_MAX": {
+      "label": "Tuning maximum",
       "description": "Maximum value that the parameter currently being tuned with the transmitter's TRANSMITTER2_TUNING knob will be set to",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "TUNE2": {
+      "label": "Tuning Parameter for TRANSMITTER_TUNE2",
       "description": "Selects parameter (normally a PID gain) that is being tuned with an RC transmitter's knob. The RC input channel used is assigned by setting RCx_OPTION to 220.",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/ArduCopter/Parameters.cpp"
     },
     "PILOT_ACC_Z": {
+      "label": "Pilot vertical acceleration",
       "description": "The vertical acceleration used when pilot is controlling the altitude",
       "units": "m/s/s",
       "reboot": false,
@@ -909,6 +992,7 @@
       ]
     },
     "PILOT_SPD_UP": {
+      "label": "Pilot maximum vertical speed ascending",
       "description": "The maximum vertical ascending velocity the pilot may request in m/s",
       "units": "m/s",
       "reboot": false,
@@ -919,6 +1003,7 @@
       ]
     },
     "PILOT_SPD_DN": {
+      "label": "Pilot maximum vertical speed descending",
       "description": "The maximum vertical descending velocity the pilot may request in m/s.  If 0 PILOT_SPD_UP value is used.",
       "units": "m/s",
       "reboot": false,
@@ -929,6 +1014,7 @@
       ]
     },
     "PILOT_TKO_ALT_M": {
+      "label": "Pilot takeoff altitude",
       "description": "Altitude that altitude control modes will climb to when a takeoff is triggered with the throttle stick.",
       "units": "m",
       "reboot": false,
@@ -939,6 +1025,7 @@
       ]
     },
     "AHRS_GPS_GAIN": {
+      "label": "AHRS GPS gain",
       "description": "This controls how much to use the GPS to correct the attitude. This should never be set to zero for a plane as it would result in the plane losing control in turns. For a plane please use the default value of 1.0.",
       "units": "",
       "reboot": false,
@@ -949,6 +1036,7 @@
       ]
     },
     "AHRS_GPS_USE": {
+      "label": "AHRS use GPS for DCM navigation and position-down",
       "description": "This controls whether to use dead-reckoning or GPS based navigation. If set to 0 then the GPS won't be used for navigation, and only dead reckoning will be used. A value of zero should never be used for normal flight. Currently this affects only the DCM-based AHRS: the EKF uses GPS according to its own parameters. A value of 2 means to use GPS for height as well as position - both in DCM estimation and when determining altitude-above-home.",
       "units": "",
       "reboot": false,
@@ -960,6 +1048,7 @@
       }
     },
     "AHRS_YAW_P": {
+      "label": "Yaw P",
       "description": "This controls the weight the compass or GPS has on the heading. A higher value means the heading will track the yaw source (GPS or compass) more rapidly.",
       "units": "",
       "reboot": false,
@@ -970,6 +1059,7 @@
       ]
     },
     "AHRS_RP_P": {
+      "label": "AHRS RP_P",
       "description": "This controls how fast the accelerometers correct the attitude",
       "units": "",
       "reboot": false,
@@ -980,6 +1070,7 @@
       ]
     },
     "AHRS_WIND_MAX": {
+      "label": "Maximum wind",
       "description": "This sets the maximum allowable difference between ground speed and airspeed. A value of zero means to use the airspeed as is. This allows the plane to cope with a failing airspeed sensor by clipping it to groundspeed plus/minus this limit. See ARSPD_OPTIONS and ARSPD_WIND_MAX to disable airspeed sensors.",
       "units": "m/s",
       "reboot": false,
@@ -990,6 +1081,7 @@
       ]
     },
     "AHRS_TRIM_X": {
+      "label": "AHRS Trim Yaw",
       "description": "Not Used",
       "units": "rad",
       "reboot": false,
@@ -1000,6 +1092,7 @@
       ]
     },
     "AHRS_ORIENTATION": {
+      "label": "Board Orientation",
       "description": "Overall board orientation relative to the standard orientation for the board type. This rotates the IMU and compass readings to allow the board to be oriented in your vehicle at any 90 or 45 degree angle. The label for each option is specified in the order of rotations for that orientation. This option takes affect on next boot. After changing you will need to re-level your vehicle. Firmware versions 4.2 and prior can use a CUSTOM (100) rotation to set the AHRS_CUSTOM_ROLL/PIT/YAW angles for AHRS orientation. Later versions provide two general custom rotations which can be used, Custom 1 and Custom 2, with CUST_ROT1_ROLL/PIT/YAW or CUST_ROT2_ROLL/PIT/YAW angles.",
       "units": "",
       "reboot": false,
@@ -1054,6 +1147,7 @@
       }
     },
     "AHRS_COMP_BETA": {
+      "label": "AHRS Velocity Complementary Filter Beta Coefficient",
       "description": "This controls the time constant for the cross-over frequency used to fuse AHRS (airspeed and heading) and GPS data to estimate ground velocity. Time constant is 0.1/beta. A larger time constant will use GPS data less and a small time constant will use air data less.",
       "units": "",
       "reboot": false,
@@ -1064,6 +1158,7 @@
       ]
     },
     "AHRS_GPS_MINSATS": {
+      "label": "AHRS GPS Minimum satellites",
       "description": "Minimum number of satellites visible to use GPS for velocity based corrections attitude correction. This defaults to 6, which is about the point at which the velocity numbers from a GPS become too unreliable for accurate correction of the accelerometers.",
       "units": "",
       "reboot": false,
@@ -1074,6 +1169,7 @@
       ]
     },
     "AHRS_EKF_TYPE": {
+      "label": "Use NavEKF Kalman filter for attitude and position estimation",
       "description": "This controls which NavEKF Kalman filter version is used for attitude and position estimation",
       "units": "",
       "reboot": false,
@@ -1087,6 +1183,7 @@
       }
     },
     "AHRS_CUSTOM_ROLL": {
+      "label": "Optional AHRS behaviour",
       "description": "This controls optional AHRS behaviour. Setting DisableDCMFallbackFW will change the AHRS behaviour for fixed wing aircraft in fly-forward flight to not fall back to DCM when the EKF stops navigating. Setting DisableDCMFallbackVTOL will change the AHRS behaviour for fixed wing aircraft in non fly-forward (VTOL) flight to not fall back to DCM when the EKF stops navigating. Setting DontDisableAirspeedUsingEKF disables the EKF based innovation check for airspeed consistency. Setting AutoRecordOrigin will auto-save the EKF origin to parameters when it becomes valid.",
       "units": "deg",
       "reboot": false,
@@ -1097,6 +1194,7 @@
       ]
     },
     "AHRS_ORIGIN_LAT": {
+      "label": "AHRS last origin latitude",
       "description": "AHRS last origin latitude in degrees",
       "units": "",
       "reboot": false,
@@ -1107,6 +1205,7 @@
       ]
     },
     "AHRS_ORIGIN_LON": {
+      "label": "AHRS last origin longitude",
       "description": "AHRS last origin longitude in degrees",
       "units": "",
       "reboot": false,
@@ -1117,6 +1216,7 @@
       ]
     },
     "AHRS_ORIGIN_ALT": {
+      "label": "AHRS last origin altitude",
       "description": "AHRS last origin altitude in meters",
       "units": "",
       "reboot": false,
@@ -1127,24 +1227,28 @@
       ]
     },
     "INS__GYROFFS_X": {
+      "label": "Gyro offsets of Z axis",
       "description": "Gyro sensor offsets of Z axis. This is setup on each boot during gyro calibrations",
       "units": "rad/s",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "INS__GYR2OFFS_X": {
+      "label": "Gyro2 offsets of Z axis",
       "description": "Gyro2 sensor offsets of Z axis. This is setup on each boot during gyro calibrations",
       "units": "rad/s",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "INS__GYR3OFFS_X": {
+      "label": "Gyro3 offsets of Z axis",
       "description": "Gyro3 sensor offsets of Z axis. This is setup on each boot during gyro calibrations",
       "units": "rad/s",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "INS__ACCSCAL_X": {
+      "label": "Accelerometer scaling of Z axis",
       "description": "Accelerometer scaling of Z axis  Calculated during acceleration calibration routine",
       "units": "",
       "reboot": false,
@@ -1155,6 +1259,7 @@
       ]
     },
     "INS__ACCOFFS_X": {
+      "label": "Accelerometer offsets of Z axis",
       "description": "Accelerometer offsets of Z axis. This is setup using the acceleration calibration or level operations",
       "units": "m/s/s",
       "reboot": false,
@@ -1165,6 +1270,7 @@
       ]
     },
     "INS__ACC2SCAL_X": {
+      "label": "Accelerometer2 scaling of Z axis",
       "description": "Accelerometer2 scaling of Z axis  Calculated during acceleration calibration routine",
       "units": "",
       "reboot": false,
@@ -1175,6 +1281,7 @@
       ]
     },
     "INS__ACC2OFFS_X": {
+      "label": "Accelerometer2 offsets of Z axis",
       "description": "Accelerometer2 offsets of Z axis. This is setup using the acceleration calibration or level operations",
       "units": "m/s/s",
       "reboot": false,
@@ -1185,6 +1292,7 @@
       ]
     },
     "INS__ACC3SCAL_X": {
+      "label": "Accelerometer3 scaling of Z axis",
       "description": "Accelerometer3 scaling of Z axis  Calculated during acceleration calibration routine",
       "units": "",
       "reboot": false,
@@ -1195,6 +1303,7 @@
       ]
     },
     "INS__ACC3OFFS_X": {
+      "label": "Accelerometer3 offsets of Z axis",
       "description": "Accelerometer3 offsets of Z axis. This is setup using the acceleration calibration or level operations",
       "units": "m/s/s",
       "reboot": false,
@@ -1205,6 +1314,7 @@
       ]
     },
     "INS__GYRO_FILTER": {
+      "label": "Gyro filter cutoff frequency",
       "description": "Filter cutoff frequency for gyroscopes. This can be set to a lower value to try to cope with very high vibration levels in aircraft. A value of zero means no filtering (not recommended!)",
       "units": "Hz",
       "reboot": false,
@@ -1215,6 +1325,7 @@
       ]
     },
     "INS__ACCEL_FILTER": {
+      "label": "Accel filter cutoff frequency",
       "description": "Filter cutoff frequency for accelerometers. This can be set to a lower value to try to cope with very high vibration levels in aircraft. A value of zero means no filtering (not recommended!)",
       "units": "Hz",
       "reboot": false,
@@ -1225,6 +1336,7 @@
       ]
     },
     "INS__USE": {
+      "label": "Use first IMU for attitude, velocity and position estimates",
       "description": "Use first IMU for attitude, velocity and position estimates",
       "units": "",
       "reboot": false,
@@ -1235,6 +1347,7 @@
       }
     },
     "INS__USE2": {
+      "label": "Use second IMU for attitude, velocity and position estimates",
       "description": "Use second IMU for attitude, velocity and position estimates",
       "units": "",
       "reboot": false,
@@ -1245,6 +1358,7 @@
       }
     },
     "INS__USE3": {
+      "label": "Use third IMU for attitude, velocity and position estimates",
       "description": "Use third IMU for attitude, velocity and position estimates",
       "units": "",
       "reboot": false,
@@ -1255,6 +1369,7 @@
       }
     },
     "INS__STILL_THRESH": {
+      "label": "Stillness threshold for detecting if we are moving",
       "description": "Threshold to tolerate vibration to determine if vehicle is motionless. This depends on the frame type and if there is a constant vibration due to motors before launch or after landing. Total motionless is about 0.05. Suggested values: Planes/rover use 0.1, multirotors use 1, tradHeli uses 5",
       "units": "",
       "reboot": false,
@@ -1265,6 +1380,7 @@
       ]
     },
     "INS__GYR_CAL": {
+      "label": "Gyro Calibration scheme",
       "description": "Conrols when automatic gyro calibration is performed",
       "units": "",
       "reboot": false,
@@ -1275,6 +1391,7 @@
       }
     },
     "INS__TRIM_OPTION": {
+      "label": "Accel cal trim option",
       "description": "Specifies how the accel cal routine determines the trims",
       "units": "",
       "reboot": false,
@@ -1286,6 +1403,7 @@
       }
     },
     "INS__ACC_BODYFIX": {
+      "label": "Body-fixed accelerometer",
       "description": "The body-fixed accelerometer to be used for trim calculation",
       "units": "",
       "reboot": false,
@@ -1297,6 +1415,7 @@
       }
     },
     "INS__POS1_X": {
+      "label": "IMU accelerometer Z position",
       "description": "Z position of the first IMU accelerometer in body frame. Positive Z is down from the origin. Attention: The IMU should be located as close to the vehicle c.g. as practical so that the value of this parameter is minimised. Failure to do so can result in noisy navigation velocity measurements due to vibration and IMU gyro noise. If the IMU cannot be moved and velocity noise is a problem, a location closer to the IMU can be used as the body frame origin.",
       "units": "m",
       "reboot": false,
@@ -1307,6 +1426,7 @@
       ]
     },
     "INS__POS2_X": {
+      "label": "IMU accelerometer Z position",
       "description": "Z position of the second IMU accelerometer in body frame. Positive Z is down from the origin. Attention: The IMU should be located as close to the vehicle c.g. as practical so that the value of this parameter is minimised. Failure to do so can result in noisy navigation velocity measurements due to vibration and IMU gyro noise. If the IMU cannot be moved and velocity noise is a problem, a location closer to the IMU can be used as the body frame origin.",
       "units": "m",
       "reboot": false,
@@ -1317,6 +1437,7 @@
       ]
     },
     "INS__POS3_X": {
+      "label": "IMU accelerometer Z position",
       "description": "Z position of the third IMU accelerometer in body frame. Positive Z is down from the origin. Attention: The IMU should be located as close to the vehicle c.g. as practical so that the value of this parameter is minimised. Failure to do so can result in noisy navigation velocity measurements due to vibration and IMU gyro noise. If the IMU cannot be moved and velocity noise is a problem, a location closer to the IMU can be used as the body frame origin.",
       "units": "m",
       "reboot": false,
@@ -1327,54 +1448,63 @@
       ]
     },
     "INS__GYR_ID": {
+      "label": "Gyro ID",
       "description": "Gyro sensor ID, taking into account its type, bus and instance",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "INS__GYR2_ID": {
+      "label": "Gyro2 ID",
       "description": "Gyro2 sensor ID, taking into account its type, bus and instance",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "INS__GYR3_ID": {
+      "label": "Gyro3 ID",
       "description": "Gyro3 sensor ID, taking into account its type, bus and instance",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "INS__ACC_ID": {
+      "label": "Accelerometer ID",
       "description": "Accelerometer sensor ID, taking into account its type, bus and instance",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "INS__ACC2_ID": {
+      "label": "Accelerometer2 ID",
       "description": "Accelerometer2 sensor ID, taking into account its type, bus and instance",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "INS__ACC3_ID": {
+      "label": "Accelerometer3 ID",
       "description": "Accelerometer3 sensor ID, taking into account its type, bus and instance",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "INS__FAST_SAMPLE": {
+      "label": "Fast sampling mask",
       "description": "Mask of IMUs to enable fast sampling on, if available",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "INS__ENABLE_MASK": {
+      "label": "IMU enable mask",
       "description": "Bitmask of IMUs to enable. It can be used to prevent startup of specific detected IMUs",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "INS__GYRO_RATE": {
+      "label": "Gyro rate for IMUs with Fast Sampling enabled",
       "description": "Gyro rate for IMUs with fast sampling enabled. The gyro rate is the sample rate at which the IMU filters operate and needs to be at least double the maximum filter frequency. If the sensor does not support the selected rate the next highest supported rate will be used. For IMUs which do not support fast sampling this setting is ignored and the default gyro rate of 1Khz is used.",
       "units": "",
       "reboot": true,
@@ -1387,54 +1517,63 @@
       }
     },
     "INS__ACC1_CALTEMP": {
+      "label": "Calibration temperature for 1st accelerometer",
       "description": "Temperature that the 1st accelerometer was calibrated at",
       "units": "degC",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "INS__GYR1_CALTEMP": {
+      "label": "Calibration temperature for 1st gyroscope",
       "description": "Temperature that the 1st gyroscope was calibrated at",
       "units": "degC",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "INS__ACC2_CALTEMP": {
+      "label": "Calibration temperature for 2nd accelerometer",
       "description": "Temperature that the 2nd accelerometer was calibrated at",
       "units": "degC",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "INS__GYR2_CALTEMP": {
+      "label": "Calibration temperature for 2nd gyroscope",
       "description": "Temperature that the 2nd gyroscope was calibrated at",
       "units": "degC",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "INS__ACC3_CALTEMP": {
+      "label": "Calibration temperature for 3rd accelerometer",
       "description": "Temperature that the 3rd accelerometer was calibrated at",
       "units": "degC",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "INS__GYR3_CALTEMP": {
+      "label": "Calibration temperature for 3rd gyroscope",
       "description": "Temperature that the 3rd gyroscope was calibrated at",
       "units": "degC",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "INS__TCAL_OPTIONS": {
+      "label": "Options for temperature calibration",
       "description": "This enables optional temperature calibration features. Setting of the Persist bits will save the temperature and/or accelerometer calibration parameters in the bootloader sector on the next update of the bootloader.",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "INS__RAW_LOG_OPT": {
+      "label": "Raw logging options",
       "description": "Raw logging options bitmask",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
     "BATT_VOLT_PIN": {
+      "label": "Battery Voltage sensing pin",
       "description": "Sets the analog input pin that should be used for voltage monitoring.",
       "units": "",
       "reboot": true,
@@ -1454,6 +1593,7 @@
       }
     },
     "BATT_CURR_PIN": {
+      "label": "Battery Current sensing pin",
       "description": "Sets the analog input pin that should be used for current monitoring.",
       "units": "",
       "reboot": true,
@@ -1473,30 +1613,35 @@
       }
     },
     "BATT_VOLT_MULT": {
+      "label": "Voltage Multiplier",
       "description": "Used to convert the voltage of the voltage sensing pin (@PREFIX@VOLT_PIN) to the actual battery's voltage (pin_voltage * VOLT_MULT). For the 3DR Power brick with a Pixhawk, this should be set to 10.1. For the Pixhawk with the 3DR 4in1 ESC this should be 12.02. For the PX using the PX4IO power supply this should be set to 1.",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_BattMonitor/AP_BattMonitor_Analog.cpp"
     },
     "BATT_AMP_PERVLT": {
+      "label": "Amps per volt",
       "description": "Number of amps that a 1V reading on the current sensor corresponds to. With a Pixhawk using the 3DR Power brick this should be set to 17. For the Pixhawk with the 3DR 4in1 ESC this should be 17. For Synthetic Current sensor monitors, this is the maximum, full throttle current draw.",
       "units": "A/V",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_BattMonitor/AP_BattMonitor_Analog.cpp"
     },
     "BATT_AMP_OFFSET": {
+      "label": "AMP offset",
       "description": "Voltage offset at zero current on current sensor for Analog Sensors. For Synthetic Current sensor, this offset is the zero throttle system current and is added to the calculated throttle base current.",
       "units": "V",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_BattMonitor/AP_BattMonitor_Analog.cpp"
     },
     "BATT_VLT_OFFSET": {
+      "label": "Voltage offset",
       "description": "Voltage offset on voltage pin. This allows for an offset due to a diode. This voltage is subtracted before the scaling is applied.",
       "units": "V",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_BattMonitor/AP_BattMonitor_Analog.cpp"
     },
     "GPS__NAVFILTER": {
+      "label": "Navigation filter setting",
       "description": "Navigation filter engine setting",
       "units": "",
       "reboot": false,
@@ -1513,6 +1658,7 @@
       }
     },
     "GPS__AUTO_SWITCH": {
+      "label": "Automatic Switchover Setting",
       "description": "Automatic switchover to GPS reporting best lock, 1:UseBest selects the GPS with highest status, if both are equal the GPS with highest satellite count is used 4:Use primary if 3D fix or better, will revert to 'UseBest' behaviour if 3D fix is lost on primary",
       "units": "",
       "reboot": false,
@@ -1525,6 +1671,7 @@
       }
     },
     "GPS__SBAS_MODE": {
+      "label": "SBAS Mode",
       "description": "This sets the SBAS (satellite based augmentation system) mode if available on this GPS. If set to 2 then the SBAS mode is not changed in the GPS. Otherwise the GPS will be reconfigured to enable/disable SBAS. Disabling SBAS may be worthwhile in some parts of the world where an SBAS signal is available but the baseline is too long to be useful.",
       "units": "",
       "reboot": false,
@@ -1536,6 +1683,7 @@
       }
     },
     "GPS__MIN_ELEV": {
+      "label": "Minimum elevation",
       "description": "This sets the minimum elevation of satellites above the horizon for them to be used for navigation. Setting this to -100 leaves the minimum elevation set to the GPS modules default.",
       "units": "deg",
       "reboot": false,
@@ -1546,6 +1694,7 @@
       ]
     },
     "GPS__INJECT_TO": {
+      "label": "Destination for GPS_INJECT_DATA MAVLink packets",
       "description": "The GGS can send raw serial packets to inject data to multiple GPSes.",
       "units": "",
       "reboot": false,
@@ -1557,6 +1706,7 @@
       }
     },
     "GPS__SBP_LOGMASK": {
+      "label": "Swift Binary Protocol Logging Mask",
       "description": "Masked with the SBP msg_type field to determine whether SBR1/SBR2 data is logged",
       "units": "",
       "reboot": false,
@@ -1568,6 +1718,7 @@
       }
     },
     "GPS__RAW_DATA": {
+      "label": "Raw data logging",
       "description": "Handles logging raw data; on uBlox chips that support raw data this will log RXM messages into logger; on Septentrio this will log on the equipment's SD card and when set to 2, the autopilot will try to stop logging after disarming and restart after arming",
       "units": "",
       "reboot": true,
@@ -1580,6 +1731,7 @@
       }
     },
     "GPS__SAVE_CFG": {
+      "label": "Save GPS configuration",
       "description": "Determines whether the configuration for this GPS should be written to non-volatile memory on the GPS. Currently working for UBlox 6 series and above.",
       "units": "",
       "reboot": false,
@@ -1591,6 +1743,7 @@
       }
     },
     "GPS__AUTO_CONFIG": {
+      "label": "Automatic GPS configuration",
       "description": "Controls if the autopilot should automatically configure the GPS based on the parameters and default settings",
       "units": "",
       "reboot": false,
@@ -1603,12 +1756,14 @@
       }
     },
     "GPS__BLEND_MASK": {
+      "label": "Multi GPS Blending Mask",
       "description": "Determines which of the accuracy measures Horizontal position, Vertical Position and Speed are used to calculate the weighting on each GPS receiver when soft switching has been selected by setting GPS_AUTO_SWITCH to 2(Blend)",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_GPS/AP_GPS.cpp"
     },
     "GPS__BLEND_TC": {
+      "label": "Blending time constant",
       "description": "Controls the slowest time constant applied to the calculation of GPS position and height offsets used to adjust different GPS receivers for steady state position differences.",
       "units": "s",
       "reboot": false,
@@ -1619,12 +1774,14 @@
       ]
     },
     "GPS__DRV_OPTIONS": {
+      "label": "driver options",
       "description": "Additional backend specific options",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_GPS/AP_GPS.cpp"
     },
     "GPS__PRIMARY": {
+      "label": "Primary GPS",
       "description": "This GPS will be used when GPS_AUTO_SWITCH is 0 and used preferentially with GPS_AUTO_SWITCH = 4.",
       "units": "",
       "reboot": false,
@@ -1635,6 +1792,7 @@
       }
     },
     "GPS__TYPE": {
+      "label": "GPS Node ID 2",
       "description": "GPS Node id for second-discovered GPS.Renamed in 4.6 and later to GPS2_CAN_NODEID.",
       "units": "ms",
       "reboot": true,
@@ -1649,6 +1807,7 @@
       }
     },
     "FENCE_ENABLE": {
+      "label": "Fence enable/disable",
       "description": "Allows you to enable (1) or disable (0) the fence functionality. Fences can still be enabled and disabled via mavlink or an RC option, but these changes are not persisted.",
       "units": "",
       "reboot": false,
@@ -1659,12 +1818,14 @@
       }
     },
     "FENCE_TYPE": {
+      "label": "Fence Type",
       "description": "Configured fence types held as bitmask. Max altitide, Circle and Polygon fences will be immediately enabled if configured. Min altitude fence will only be enabled once the minimum altitude is reached.",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_Fence/AC_Fence.cpp"
     },
     "FENCE_ACTION": {
+      "label": "Fence Action",
       "description": "What action should be taken when fence is breached",
       "units": "",
       "reboot": false,
@@ -1675,6 +1836,7 @@
       }
     },
     "FENCE_ALT_MAX": {
+      "label": "Fence Maximum Altitude",
       "description": "Maximum altitude allowed before geofence triggers. See FENCE_ALT_MAX_TP for reference frame.",
       "units": "m",
       "reboot": false,
@@ -1685,6 +1847,7 @@
       ]
     },
     "FENCE_RADIUS": {
+      "label": "Circular Fence Radius",
       "description": "Circle fence radius which when breached will cause an RTL",
       "units": "m",
       "reboot": false,
@@ -1695,6 +1858,7 @@
       ]
     },
     "FENCE_MARGIN": {
+      "label": "Fence Margin",
       "description": "Distance that autopilot's should maintain from the fence to avoid a breach",
       "units": "m",
       "reboot": false,
@@ -1705,6 +1869,7 @@
       ]
     },
     "FENCE_TOTAL": {
+      "label": "Fence polygon point total",
       "description": "Number of polygon points saved in eeprom (do not update manually)",
       "units": "",
       "reboot": false,
@@ -1715,6 +1880,7 @@
       ]
     },
     "FENCE_ALT_MIN": {
+      "label": "Fence Minimum Altitude",
       "description": "Minimum altitude allowed before geofence triggers. See FENCE_ALT_MIN_TP for reference frame.",
       "units": "m",
       "reboot": false,
@@ -1725,6 +1891,7 @@
       ]
     },
     "FENCE_RET_RALLY": {
+      "label": "Fence Return to Rally",
       "description": "Should the vehicle return to fence return point or rally point",
       "units": "",
       "reboot": false,
@@ -1739,6 +1906,7 @@
       }
     },
     "FENCE_RET_ALT": {
+      "label": "Fence Return Altitude",
       "description": "Altitude the vehicle will transit to when a fence breach occurs",
       "units": "m",
       "reboot": false,
@@ -1749,6 +1917,7 @@
       ]
     },
     "FENCE_AUTOENABLE": {
+      "label": "Fence Auto-Enable",
       "description": "Auto-enable of fences. AutoEnableOnTakeoff enables all configured fences, except the minimum altitude fence (which is enabled when the minimum altitude is reached), after autotakeoffs reach altitude. During autolandings the fences will be disabled.  AutoEnableDisableFloorOnLanding enables all configured fences, except the minimum altitude fence (which is enabled when the minimum altitude is reached), after autotakeoffs reach altitude. During autolandings only the Minimum Altitude fence will be disabled. AutoEnableOnlyWhenArmed enables all configured fences on arming, except the minimum altitude fence (which is enabled when the minimum altitude is reached), but no fences are disabled during autolandings. However, fence breaches are ignored while executing prior breach recovery actions which may include autolandings.",
       "units": "",
       "reboot": false,
@@ -1759,12 +1928,14 @@
       ]
     },
     "FENCE_OPTIONS": {
+      "label": "Fence options",
       "description": "When bit 0 is set disable mode change following fence action until fence breach is cleared. When bit 1 is set the allowable flight areas is the union of all polygon and circle fence areas instead of the intersection, which means a fence breach occurs only if you are outside all of the fence areas.",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AC_Fence/AC_Fence.cpp"
     },
     "FENCE_NTF_FREQ": {
+      "label": "Fence margin notification frequency in hz",
       "description": "When bit 2 of FENCE_OPTIONS is set this parameter controls the frequency of margin breach notifications. If set to 0 only new margin breaches are notified.",
       "units": "Hz",
       "reboot": false,
@@ -1775,6 +1946,7 @@
       ]
     },
     "FENCE_MARGIN_XY": {
+      "label": "Fence Horizontal Margin",
       "description": "Distance that autopilot's should maintain from the fence in the horizontal plane to avoid a breach. If set to 0 then FENCE_MARGIN is used.",
       "units": "m",
       "reboot": false,
@@ -1785,6 +1957,7 @@
       ]
     },
     "FENCE_ALT_MAX_TP": {
+      "label": "Altitude max frame type",
       "description": "The altitude reference frame for the maximum altitude fence. Can be AMSL, home-relative, origin relative or AGL.",
       "units": "",
       "reboot": false,
@@ -1797,6 +1970,7 @@
       }
     },
     "FENCE_ALT_MIN_TP": {
+      "label": "Altitude min frame type",
       "description": "The altitude reference frame for the minimum altitude fence. Can be AMSL, home-relative, origin relative or AGL.",
       "units": "",
       "reboot": false,
@@ -1809,6 +1983,7 @@
       }
     },
     "RC1_MIN": {
+      "label": "RC min PWM",
       "description": "RC minimum PWM pulse width in microseconds. Typically 1000 is lower limit, 1500 is neutral and 2000 is upper limit.",
       "units": "PWM",
       "reboot": false,
@@ -1819,6 +1994,7 @@
       ]
     },
     "RC1_TRIM": {
+      "label": "RC trim PWM",
       "description": "RC trim (neutral) PWM pulse width in microseconds. Typically 1000 is lower limit, 1500 is neutral and 2000 is upper limit.",
       "units": "PWM",
       "reboot": false,
@@ -1829,6 +2005,7 @@
       ]
     },
     "RC1_MAX": {
+      "label": "RC max PWM",
       "description": "RC maximum PWM pulse width in microseconds. Typically 1000 is lower limit, 1500 is neutral and 2000 is upper limit.",
       "units": "PWM",
       "reboot": false,
@@ -1839,6 +2016,7 @@
       ]
     },
     "RC1_REVERSED": {
+      "label": "RC reversed",
       "description": "Reverse channel input. Set to 0 for normal operation. Set to 1 to reverse this input channel.",
       "units": "",
       "reboot": false,
@@ -1849,6 +2027,7 @@
       }
     },
     "RC1_DZ": {
+      "label": "RC dead-zone",
       "description": "PWM dead zone in microseconds around trim or bottom",
       "units": "PWM",
       "reboot": false,
@@ -1859,12 +2038,14 @@
       ]
     },
     "RC1_OPTION": {
+      "label": "RC input option",
       "description": "Function assigned to this RC channel",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/RC_Channel/RC_Channel.cpp"
     },
     "SERVO1_MIN": {
+      "label": "Minimum PWM",
       "description": "minimum PWM pulse width in microseconds. Typically 1000 is lower limit, 1500 is neutral and 2000 is upper limit.",
       "units": "PWM",
       "reboot": false,
@@ -1875,6 +2056,7 @@
       ]
     },
     "SERVO1_MAX": {
+      "label": "Maximum PWM",
       "description": "maximum PWM pulse width in microseconds. Typically 1000 is lower limit, 1500 is neutral and 2000 is upper limit.",
       "units": "PWM",
       "reboot": false,
@@ -1885,6 +2067,7 @@
       ]
     },
     "SERVO1_TRIM": {
+      "label": "Trim PWM",
       "description": "Trim PWM pulse width in microseconds. Typically 1000 is lower limit, 1500 is neutral and 2000 is upper limit.",
       "units": "PWM",
       "reboot": false,
@@ -1895,6 +2078,7 @@
       ]
     },
     "SERVO1_REVERSED": {
+      "label": "Servo reverse",
       "description": "Reverse servo operation. Set to 0 for normal operation. Set to 1 to reverse this output channel.",
       "units": "",
       "reboot": false,
@@ -1905,6 +2089,7 @@
       }
     },
     "SERVO1_FUNCTION": {
+      "label": "Servo output function",
       "description": "Function assigned to this servo. Setting this to Disabled(0) will setup this output for control by auto missions or MAVLink servo set commands. any other value will enable the corresponding function",
       "units": "",
       "reboot": true,
@@ -1914,6 +2099,7 @@
       }
     },
     "ATC_RATE_FF_ENAB": {
+      "label": "Rate Feedforward Enable",
       "description": "Controls whether body-frame rate feedforward is enabled or disabled",
       "units": "",
       "reboot": false,
@@ -1924,6 +2110,7 @@
       }
     },
     "ATC_ANGLE_BOOST": {
+      "label": "Angle Boost",
       "description": "Angle Boost increases output throttle as the vehicle leans to reduce loss of altitude",
       "units": "",
       "reboot": false,
@@ -1934,6 +2121,7 @@
       }
     },
     "ATC_ANG_RLL_P": {
+      "label": "Roll axis angle controller P gain",
       "description": "Roll axis angle controller P gain.  Converts the error between the desired roll angle and actual angle to a desired roll rate",
       "units": "",
       "reboot": false,
@@ -1944,6 +2132,7 @@
       ]
     },
     "ATC_ANG_PIT_P": {
+      "label": "Pitch axis angle controller P gain",
       "description": "Pitch axis angle controller P gain.  Converts the error between the desired pitch angle and actual angle to a desired pitch rate",
       "units": "",
       "reboot": false,
@@ -1954,6 +2143,7 @@
       ]
     },
     "ATC_ANG_YAW_P": {
+      "label": "Yaw axis angle controller P gain",
       "description": "Yaw axis angle controller P gain.  Converts the error between the desired yaw angle and actual angle to a desired yaw rate",
       "units": "",
       "reboot": false,
@@ -1964,6 +2154,7 @@
       ]
     },
     "ATC_ANG_LIM_TC": {
+      "label": "Angle Limit (to maintain altitude) Time Constant",
       "description": "Angle Limit (to maintain altitude) Time Constant",
       "units": "",
       "reboot": false,
@@ -1974,6 +2165,7 @@
       ]
     },
     "ATC_RATE_R_MAX": {
+      "label": "Angular Velocity Max for Roll",
       "description": "Maximum angular velocity in roll axis",
       "units": "deg/s",
       "reboot": false,
@@ -1990,6 +2182,7 @@
       }
     },
     "ATC_RATE_P_MAX": {
+      "label": "Angular Velocity Max for Pitch",
       "description": "Maximum angular velocity in pitch axis",
       "units": "deg/s",
       "reboot": false,
@@ -2006,6 +2199,7 @@
       }
     },
     "ATC_RATE_Y_MAX": {
+      "label": "Angular Velocity Max for Yaw",
       "description": "Maximum angular velocity in yaw axis",
       "units": "deg/s",
       "reboot": false,
@@ -2022,6 +2216,7 @@
       }
     },
     "ATC_INPUT_TC": {
+      "label": "Attitude control input time constant",
       "description": "Attitude control input time constant.  Low numbers lead to sharper response, higher numbers to softer response",
       "units": "s",
       "reboot": false,
@@ -2039,6 +2234,7 @@
       }
     },
     "ATC_LAND_R_MULT": {
+      "label": "Landed roll gain multiplier",
       "description": "Roll gain multiplier active when landed. A factor of 1.0 means no reduction in gain while landed. Reduce this factor to reduce ground oscitation in the roll axis. ",
       "units": "",
       "reboot": false,
@@ -2049,6 +2245,7 @@
       ]
     },
     "ATC_LAND_P_MULT": {
+      "label": "Landed pitch gain multiplier",
       "description": "Pitch gain multiplier active when landed. A factor of 1.0 means no reduction in gain while landed. Reduce this factor to reduce ground oscitation in the pitch axis. ",
       "units": "",
       "reboot": false,
@@ -2059,6 +2256,7 @@
       ]
     },
     "ATC_LAND_Y_MULT": {
+      "label": "Landed yaw gain multiplier",
       "description": "Yaw gain multiplier active when landed. A factor of 1.0 means no reduction in gain while landed. Reduce this factor to reduce ground oscitation in the yaw axis. ",
       "units": "",
       "reboot": false,
@@ -2069,6 +2267,7 @@
       ]
     },
     "ATC_ANGLE_MAX": {
+      "label": "Angle Max",
       "description": "Maximum lean angle in all flight modes",
       "units": "deg",
       "reboot": false,
@@ -2079,6 +2278,7 @@
       ]
     },
     "ATC_RATE_WPY_MAX": {
+      "label": "Yaw target slew rate",
       "description": "Maximum rate the yaw target can be updated in Auto, Guided, Circle, Follow, RTL, SmartRTL, Throw and ZigZag flight modes",
       "units": "deg/s",
       "reboot": false,
@@ -2089,6 +2289,7 @@
       ]
     },
     "ATC_ACC_Y_MAX": {
+      "label": "Acceleration Max for Yaw",
       "description": "Maximum acceleration in yaw axis",
       "units": "deg/s/s",
       "reboot": false,
@@ -2106,6 +2307,7 @@
       }
     },
     "ATC_ACC_R_MAX": {
+      "label": "Acceleration Max for Roll",
       "description": "Maximum acceleration in roll axis",
       "units": "deg/s/s",
       "reboot": false,
@@ -2123,6 +2325,7 @@
       }
     },
     "ATC_ACC_P_MAX": {
+      "label": "Acceleration Max for Pitch",
       "description": "Maximum acceleration in pitch axis",
       "units": "deg/s/s",
       "reboot": false,

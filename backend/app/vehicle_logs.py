@@ -33,8 +33,10 @@ class VehicleLogs:
                 if len(self.entries)==self.expected:self.state='SUCCEEDED'
             elif msg.get_type()=='LOG_DATA' and self.state=='DOWNLOADING' and int(msg.id)==self.log_id:
                 offset=int(msg.ofs); count=int(msg.count); size=len(self.buffer)
-                if offset<0 or offset%90 or not 0<count<=90 or offset+count>size or count!=min(90,size-offset):return
-                self.buffer[offset:offset+count]=bytes(msg.data)[:count]; self.received.add(offset);self.last=time.monotonic();self.retries=0
+                if offset<0 or offset>=size or offset%90 or not 0<count<=90:return
+                needed=min(90,size-offset)
+                if count<needed:return
+                self.buffer[offset:offset+needed]=bytes(msg.data)[:needed]; self.received.add(offset);self.last=time.monotonic();self.retries=0
                 if len(self.received)==(size+89)//90:self.state='DOWNLOADED'
                 elif all(i in self.received for i in range(self.window_start,self.window_start+self.window_count,90)):self.last=0
     def next_request(self,now=None):

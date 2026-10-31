@@ -107,6 +107,11 @@ class HttpWorkflowTests(unittest.TestCase):
             self.assertEqual(response.status,200);response.read()
         finally:connection.close()
 
+    def test_parameter_csv_exports_protocol_annotated_cache(self):
+        mavlink.parameters.begin_session('export-test');mavlink.parameters.ingest('GAIN',1.5,9,0,1)
+        status,kind,body=get_json(self.base+'/api/parameters/export?format=csv')
+        self.assertEqual(status,200);self.assertEqual(kind,'text/csv');self.assertIn(b'GAIN',body)
+
     def setUp(self):
         simulator.stop(); mavlink.disconnect(); vehicle_state.reset()
         mavlink.workflows.owner=None

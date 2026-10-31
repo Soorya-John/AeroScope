@@ -194,13 +194,15 @@ class MavlinkManager:
                 self._writer_thread.start()
                 self.normalizer.reset_session()
                 self.state.reset()
+                self.state.update_vehicle(environment=(self._config or {}).get('environment','physical'))
                 first_deadline = time.monotonic() + 15
                 seen_heartbeat = False
                 next_gcs_heartbeat=0.0
                 target_system: int | None = None
                 while not self._stop.is_set():
                     with self._write_lock:
-                        msg = connection.recv_match(blocking=True, timeout=0.5)
+                        msg = connection.recv_match(blocking=False)
+                    if msg is None:self._stop.wait(.01)
                     if msg is not None:
                         kind = msg.get_type()
                         source_system = msg.get_srcSystem() if hasattr(msg, "get_srcSystem") else None
@@ -248,7 +250,7 @@ class MavlinkManager:
                                     if missing is not None:self._outbound.put((self._session_id,{"kind":"mission_request","seq":missing}))
                         elif kind in ("MISSION_REQUEST_INT","MISSION_REQUEST") and self.missions.snapshot()["state"]=="UPLOADING":
                             item=self.missions.requested_item(int(msg.seq))
-                            if item:self._outbound.put((self._session_id,{"kind":"mission_item","integer":kind=="MISSION_REQUEST_INT",**item}))
+                            if item:self._outbound.put((self._session_id,{"kind":"mission_item","integer":kind=="MISSION_REQUEST_INT" or self._mission_integer_protocol() is not False,**item}))
                         elif kind=="MISSION_ACK": self.missions.ack(int(msg.type))
                         elif kind=="MISSION_CURRENT": self.missions.update_current(int(msg.seq),getattr(msg,"mission_state",None))
                         elif kind=="MISSION_ITEM_REACHED": self.missions.item_reached(int(msg.seq))
@@ -302,7 +304,7 @@ class MavlinkManager:
                                 self._capabilities["version_request_state"]="UNKNOWN"
                     self.parameters.expire()
                     for index in self.parameters.recovery_indices():
-                        self._outbound.put_nowait((self._session_id,{"kind":"param_read","name":"","index":index}))
+                        self._outbound.put_nowait((self._session_id,{'kind':'param_list'} if index==-1 else {"kind":"param_read","name":"","index":index}))
                     retry_payload = self.missions.retry_payload()
                     if retry_payload:
                         self._outbound.put_nowait((self._session_id,retry_payload))
@@ -502,6 +504,7 @@ class MavlinkManager:
         return dict(request)
 
     def request_parameters(self) -> None:
+        if any(p.get('state') in {'PENDING','IN_PROGRESS'} and 'requested_value' in p for p in self.parameters.snapshot()['pending'].values()):raise RuntimeError('Wait for parameter writes before starting a new list download')
         session=self._active_control_session(); self.parameters.request_all()
         self._outbound.put((session,{"kind":"param_list"}))
 
@@ -515,6 +518,8 @@ class MavlinkManager:
 
     def set_parameter(self, name: str, value: Any, *, confirmed: bool = False) -> None:
         name=self._validate_param_name(name); session=self._active_control_session()
+        progress=self.parameters.snapshot()['progress']
+        if progress['elapsed_s'] is not None and not progress['complete'] and not progress['error']:raise RuntimeError('Wait for the active parameter download or cancel it before writing')
         current=next((p for p in self.parameters.snapshot()["parameters"] if p["name"]==name),None)
         if not current: raise ValueError("Parameter is not in the current vehicle cache; refresh it first")
         param_type=int(current["type"])
@@ -586,12 +591,14 @@ class MavlinkManager:
 
     def upload_mission(self, items: list[dict[str,Any]], *, confirmed: bool = False) -> dict[str,Any]:
         if confirmed is not True: raise ValueError("Explicit mission upload confirmation is required")
+        self.workflows.copter()
         session=self._active_control_session(); self._require_mission_support(); checked=self.missions.upload_started(items)
         self._outbound.put((session,{"kind":"mission_count","count":len(checked)}))
         return self.missions.snapshot()
 
     def clear_mission(self, *, confirmed: bool = False) -> dict[str,Any]:
         if confirmed is not True: raise ValueError("Explicit mission clear confirmation is required")
+        self.workflows.copter()
         session=self._active_control_session(); self._require_mission_support(); self.missions.clear_started(); self._outbound.put((session,{"kind":"mission_clear"}))
         return self.missions.snapshot()
 
@@ -733,7 +740,7 @@ class MavlinkManager:
                     continue
                 if isinstance(payload, dict) and payload.get("kind", "").startswith("mission_"):
                     mission=self.missions.snapshot()
-                    if payload.get('_operation')!=mission['mission_id'] or mission['state']=='CANCELLED': continue
+                    if payload.get('_operation')!=mission['mission_id'] or mission['state']=='CANCELLED' and not payload.get('cancel'): continue
                     sf=self.state.snapshot()["vehicle"]; sysf=sf.get("system_id"); cpf=sf.get("component_id")
                     sysid=sysf.get("value") if isinstance(sysf,dict) else sysf; compid=cpf.get("value") if isinstance(cpf,dict) else cpf
                     if not sysid or not compid: raise RuntimeError("Vehicle target identity unavailable")
@@ -750,7 +757,7 @@ class MavlinkManager:
                         elif k=="mission_item":
                             item=payload
                             if item.get("integer",True):
-                                connection.mav.mission_item_int_send(sysid,compid,item["seq"],item["frame"],item["command"],item["current"],item["autocontinue"],item["param1"],item["param2"],item["param3"],item["param4"],round(item["latitude"]*1e7),round(item["longitude"]*1e7),item["altitude"],0)
+                                connection.mav.mission_item_int_send(sysid,compid,item["seq"],{5:0,6:3}.get(item["frame"],item["frame"]),item["command"],item["current"],item["autocontinue"],item["param1"],item["param2"],item["param3"],item["param4"],round(item["latitude"]*1e7),round(item["longitude"]*1e7),item["altitude"],0)
                             else:
                                 frame={5:0,6:3}.get(item["frame"],item["frame"])
                                 connection.mav.mission_item_send(sysid,compid,item["seq"],frame,item["command"],item["current"],item["autocontinue"],item["param1"],item["param2"],item["param3"],item["param4"],item["latitude"],item["longitude"],item["altitude"],0)

@@ -37,15 +37,20 @@ class MissionManager:
             if self._state in {'DOWNLOADING','UPLOADING','CLEARING'}:
                 self._state='CANCELLED'; self._detail='Transfer stopped locally; onboard outcome may be unknown'
     def _start(self):
-        if self._state in {'DOWNLOADING','UPLOADING','CLEARING'}: raise RuntimeError('A mission transfer is already active')
-        self._last_activity=time.monotonic(); self._retries=0; self._requested=set(); self._got_count=False
+        with self._lock:
+            if self._state in {'STARTING','DOWNLOADING','UPLOADING','CLEARING'}: raise RuntimeError('A mission transfer is already active')
+            self._state='STARTING'; self._last_activity=time.monotonic(); self._retries=0; self._requested=set(); self._got_count=False
     def retry_payload(self, now=None):
         now=time.monotonic() if now is None else now
         with self._lock:
-            if self._state != 'DOWNLOADING' or now-self._last_activity<2: return None
+            if self._state not in {'DOWNLOADING','UPLOADING'} or now-self._last_activity<2: return None
             if self._retries>=5:
                 self._state='UNKNOWN'; self._detail='Mission read retry limit reached'; return None
             self._last_activity=now; self._retries+=1
+            if self._state=='UPLOADING':
+                if not self._requested:return {'kind':'mission_count','count':len(self._upload)}
+                if len(self._requested)==len(self._upload):return {'kind':'mission_item','integer':True,**self._upload[-1]}
+                return None
             if not self._got_count: return {'kind':'mission_list'}
             missing=next((i for i in range(self._expected) if i not in self._received),None)
             return {'kind':'mission_request','seq':missing} if missing is not None else None
@@ -58,6 +63,7 @@ class MissionManager:
         with self._lock:
             if self._state!="DOWNLOADING": return False
             if count<0 or count>MAX_ITEMS: self._state="FAILED"; self._detail="Vehicle mission count exceeds supported limit"; return False
+            if self._got_count and self._expected!=int(count):self._state='FAILED';self._detail='Mission count changed during download; restart';return False
             self._expected=int(count)
             self._got_count=True; self._last_activity=time.monotonic()
             if count==0: self._items=[]; self._state="SUCCEEDED"

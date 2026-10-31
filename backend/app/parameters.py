@@ -75,7 +75,10 @@ class ParameterStore:
     def recovery_indices(self, now=None):
         now=time.monotonic() if now is None else now
         with self._lock:
-            if self._started is None or self._error or self._count is None or now-self._last_recovery<2: return []
+            if self._started is None or self._error or now-self._last_recovery<2: return []
+            if self._count is None:
+                if self._recovery_round>=5:self._error='No parameter list response after 5 requests';return []
+                self._last_recovery=now;self._recovery_round+=1;return [-1]
             missing=[i for i in range(self._count) if i not in self._indices]
             if not missing: return []
             self._last_recovery=now; self._recovery_round+=1
