@@ -18,6 +18,7 @@ from .parameters import (ParameterStore, validate_ext_parameter_value, validate_
 from .missions import MissionManager, validate_mission
 from .firmware import parameter_encoding, encode_parameter, decode_parameter
 from .workflows import Workflows
+from .vehicle_logs import VehicleLogs
 
 class OperationQueue(Queue):
     """Tag mutable protocol operations so cancellation invalidates queued writes."""
@@ -91,6 +92,7 @@ class MavlinkManager:
         self.missions = MissionManager()
         self._selected_target: tuple[int, int] | None = None
         self.workflows=Workflows(self)
+        self.vehicle_logs=VehicleLogs()
 
     def status(self) -> dict[str, Any]:
         with self._lock:
@@ -142,6 +144,7 @@ class MavlinkManager:
             self.transactions.cancel_session(session_id)
             self.parameters.cancel("Disconnected; pending write outcomes may be unknown")
             self.missions.cancel()
+            self.vehicle_logs.cancel()
         while True:
             try: self._outbound.get_nowait(); self._outbound.task_done()
             except Empty: break
@@ -179,6 +182,7 @@ class MavlinkManager:
                     self.transactions.begin_session(self._session_id)
                     self.parameters.begin_session(self._session_id)
                     self.missions.begin_session(self._session_id)
+                    self.vehicle_logs.begin_session(self._session_id)
                     self._capabilities = {"available": False, "modes": [], "reason": "Waiting for heartbeat"}
                     self._version_requested_session = None
                     self._mode_request = None
@@ -212,6 +216,7 @@ class MavlinkManager:
                         elif target_system is not None and source_system not in (None, target_system):
                             continue
                         if kind == "COMMAND_ACK" and target_system is not None:
+                            if int(getattr(msg,'target_system',255)) not in (0,255) or int(getattr(msg,'target_component',190)) not in (0,190):continue
                             acknowledged=self.transactions.acknowledge(int(msg.command), int(source_system or 0),
                                 int(msg.get_srcComponent() or 0), int(msg.result),
                                 getattr(msg, "progress", None), getattr(msg, "result_param2", None))
@@ -249,6 +254,7 @@ class MavlinkManager:
                         elif kind=="MISSION_ITEM_REACHED": self.missions.item_reached(int(msg.seq))
                         self.normalizer.ingest(msg)
                         self.workflows.ingest(msg)
+                        self.vehicle_logs.ingest(msg)
                         if kind=="AUTOPILOT_VERSION":
                             with self._lock:
                                 self._capabilities["version_received"]=True
@@ -301,6 +307,8 @@ class MavlinkManager:
                     if retry_payload:
                         self._outbound.put_nowait((self._session_id,retry_payload))
                     self.missions.expire()
+                    log_request=self.vehicle_logs.next_request()
+                    if log_request:self._outbound.put_nowait((self._session_id,log_request))
                     with self._lock:
                         if self._mode_request and self._mode_request.get("state") == "PENDING" and time.time() - self._mode_request["requested_at"] > 8:
                             self._mode_request["state"] = "UNKNOWN"
@@ -348,6 +356,7 @@ class MavlinkManager:
                     self.transactions.cancel_session(stale_session, "MAVLink transport disconnected")
                     self.parameters.cancel("Transport disconnected")
                     self.missions.cancel()
+                    self.vehicle_logs.cancel()
                     with self._lock:
                         if self._mode_request and self._mode_request.get("session_id") == stale_session and self._mode_request.get("state") == "PENDING":
                             self._mode_request["state"] = "CANCELLED"
@@ -374,6 +383,7 @@ class MavlinkManager:
         compid = comp_field.get("value") if isinstance(comp_field, dict) else comp_field
         if not sysid or not compid: raise RuntimeError("Vehicle target identity is unavailable")
         transaction = self.transactions.create(command, sysid, compid, timeout, safe_retry)
+        self.workflows.track_action(transaction,command,parameters)
         with self._lock:
             if self._session_id != session:
                 self.transactions.cancel_session(session, "Connection session changed")
@@ -688,6 +698,14 @@ class MavlinkManager:
                     with self._write_lock:
                         if payload['kind']=='gcs_heartbeat': connection.mav.heartbeat_send(6,8,0,0,4,3)
                         else: connection.mav.request_data_stream_send(int(system),int(self.state.snapshot()['vehicle']['component_id']['value']),0,4,1)
+                    continue
+                if isinstance(payload,dict) and payload.get('kind','').startswith('log_'):
+                    k=payload['kind']; comp=int(self.state.snapshot()['vehicle']['component_id']['value'])
+                    if k!='log_end' and self.vehicle_logs.state not in {'LISTING','DOWNLOADING'}:continue
+                    with self._write_lock:
+                        if k=='log_list':connection.mav.log_request_list_send(system,comp,0,65535)
+                        elif k=='log_data':connection.mav.log_request_data_send(system,comp,payload['id'],payload['offset'],payload['count'])
+                        elif k=='log_end':connection.mav.log_request_end_send(system,comp)
                     continue
                 if isinstance(payload,dict) and payload.get('kind')=='command_int':
                     txid=payload['transaction_id']; params=payload['params']

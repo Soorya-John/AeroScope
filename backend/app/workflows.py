@@ -15,15 +15,44 @@ GROUPS = {
  'Outputs':['SERVO1_FUNCTION','SERVO2_FUNCTION','SERVO3_FUNCTION','SERVO4_FUNCTION','MOT_PWM_TYPE','MOT_SPIN_ARM','MOT_SPIN_MIN'],
  'Tuning':['ATC_RAT_RLL_P','ATC_RAT_RLL_I','ATC_RAT_RLL_D','ATC_RAT_PIT_P','ATC_RAT_PIT_I','ATC_RAT_PIT_D','WPNAV_SPEED','WPNAV_ACCEL','WP_SPD','WP_ACCEL']}
 
-GET_ROUTES={'/api/setup','/api/control/ownership','/api/parameters/batch','/api/connection/ports'}
+GET_ROUTES={'/api/setup','/api/control/ownership','/api/parameters/batch','/api/connection/ports','/api/vehicle-logs','/api/control/actions'}
 POST_ROUTES={'/api/control/claim','/api/control/release','/api/parameters/stage','/api/parameters/apply','/api/parameters/cancel','/api/mission/cancel','/api/setup/calibrate','/api/setup/position','/api/setup/cancel-calibration','/api/setup/motor-test','/api/maintenance/reboot'}
+POST_ROUTES.update({'/api/vehicle-logs/list','/api/vehicle-logs/download','/api/vehicle-logs/cancel','/api/vehicle-logs/analyze'})
 def vehicle_mutation(path):
-    return path.startswith(('/api/control/','/api/guided/','/api/mission/','/api/setup/','/api/maintenance/')) or path in {'/api/parameters/request','/api/parameters/set','/api/parameters/refresh','/api/connection','/api/connection/disconnect'}
+    return path.startswith(('/api/control/','/api/guided/','/api/mission/','/api/setup/','/api/maintenance/')) or path in {'/api/parameters/request','/api/parameters/set','/api/parameters/refresh','/api/connection','/api/connection/disconnect','/api/simulation'}
 
 class Workflows:
     def __init__(self, mavlink):
         self.m=mavlink; self.lock=threading.RLock(); self.owner=None; self.lease_until=0
         self.batch=None; self.calibration={'state':'IDLE'}; self.messages=deque(maxlen=60)
+        self.actions=deque(maxlen=100)
+
+    def track_action(self,tx,command,params):
+        if command in {21,22,178,192}:
+            self.actions.appendleft({'transaction_id':tx.id,'session_id':tx.session_id,'command':command,'params':list(params),'state':'AWAITING_ACK','observed':None,'created':time.monotonic()})
+
+    def action_status(self):
+        snapshot=self.m.state.snapshot();position=snapshot['position'];txs={t['id']:t for t in self.m.transactions.list()}
+        for action in self.actions:
+            if action['state'] in {'OBSERVED','FAILED','UNKNOWN'}:continue
+            tx=txs.get(action['transaction_id'],{})
+            if action['session_id']!=self.m.status()['session_id']:action.update(state='UNKNOWN',observed='Session changed');continue
+            if tx.get('state') in {'FAILED','UNKNOWN','CANCELLED'}:action.update(state=tx['state'],observed=tx.get('result') or tx.get('detail'));continue
+            if tx.get('state')!='SUCCEEDED':continue
+            action['state']='ACCEPTED_AWAITING_OBSERVATION';p=action['params'];command=action['command']
+            def value(key):
+                field=position[key]
+                return field.get('value') if field.get('available') and field.get('fresh',True) else None
+            alt=value('relative_altitude_m');speed=value('ground_speed_m_s');lat=value('latitude_deg');lon=value('longitude_deg')
+            observed=False;detail=''
+            if command==22 and alt is not None:observed=alt>=p[6]-.75;detail=f'Relative altitude {alt:.1f} m (target {p[6]} m)'
+            elif command==21:observed=snapshot['status']['armed'].get('value') is False and alt is not None and alt<.75;detail='Disarmed and near home altitude; inspect landing surface'
+            elif command==192 and lat is not None and lon is not None and alt is not None:
+                distance=math.hypot((lat-p[4])*111320,(lon-p[5])*111320*math.cos(math.radians(lat)));observed=distance<3 and abs(alt-p[6])<2;detail=f'{distance:.1f} m from requested position, relative altitude {alt:.1f} m'
+            elif command==178 and speed is not None:observed=abs(speed-p[1])<.5;detail=f'Measured ground speed {speed:.1f} m/s within 0.5 m/s tolerance'
+            if observed:action.update(state='OBSERVED',observed=detail)
+            elif time.monotonic()-action['created']>180:action.update(state='UNKNOWN',observed='Action observation timed out; inspect vehicle')
+        return [{k:v for k,v in a.items() if k!='created'} for a in self.actions]
 
     def ownership(self):
         with self.lock:
@@ -167,6 +196,8 @@ class Workflows:
 
     def dispatch(self, method, path, body, client):
         if method=='GET':
+            if path=='/api/control/actions':return {'actions':self.action_status()}
+            if path=='/api/vehicle-logs':return self.m.vehicle_logs.snapshot()
             if path=='/api/setup': return self.setup()
             if path=='/api/control/ownership': return self.ownership()
             if path=='/api/parameters/batch': return self.batch or {'state':'IDLE'}
@@ -178,6 +209,18 @@ class Workflows:
         if path=='/api/control/release':
             self.require_owner(client); self.owner=None; return self.ownership()
         self.require_owner(client)
+        if path.startswith('/api/vehicle-logs/'):
+            self.copter(disarmed=True);session=self.m._active_control_session()
+            if path.endswith('/list'):
+                self.m.vehicle_logs.list_started();self.m._outbound.put((session,{'kind':'log_list'}))
+            elif path.endswith('/download'):
+                payload=self.m.vehicle_logs.download_started(int(body.get('id',-1)));self.m._outbound.put((session,payload))
+            elif path.endswith('/cancel'):
+                self.m.vehicle_logs.cancel();self.m._outbound.put((session,{'kind':'log_end'}))
+            elif path.endswith('/analyze'):
+                from .main import analyzer
+                return analyzer.upload_bytes(f'vehicle-{self.m.vehicle_logs.log_id}.BIN',self.m.vehicle_logs.bytes())
+            return self.m.vehicle_logs.snapshot()
         if path=='/api/parameters/stage': return self.stage(body)
         if path=='/api/parameters/apply': return self.apply(body)
         if path=='/api/parameters/cancel':

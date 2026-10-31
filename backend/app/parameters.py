@@ -1,6 +1,7 @@
 """Typed MAVLink parameter cache and validation helpers."""
 from __future__ import annotations
 import math
+import struct
 import threading
 import time
 from typing import Any
@@ -20,6 +21,10 @@ def validate_parameter_value(value: Any, param_type: int) -> int | float:
     if param_type in {9, 10}:
         if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(float(value)):
             raise ValueError("Float parameter requires a finite numeric value")
+        if param_type==9:
+            try: value=struct.unpack('<f',struct.pack('<f',value))[0]
+            except (OverflowError,struct.error) as exc:raise ValueError('Value exceeds finite REAL32 range') from exc
+            if not math.isfinite(value):raise ValueError('Value exceeds finite REAL32 range')
         return float(value)
     raise ValueError(f"Unsupported MAV_PARAM_TYPE {param_type}")
 

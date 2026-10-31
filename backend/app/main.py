@@ -187,7 +187,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         url = urlsplit(self.path)
         path = url.path
-        if path in {"/api/setup","/api/control/ownership","/api/parameters/batch","/api/connection/ports"}:
+        if path in GET_ROUTES:
             try: self._send_json(200,mavlink.workflows.dispatch('GET',path,{},None))
             except (ValueError,RuntimeError,ImportError) as exc: self._send_json(409,{'error':str(exc)})
             return

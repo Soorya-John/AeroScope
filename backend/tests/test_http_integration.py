@@ -21,7 +21,7 @@ def get_json(url: str):
 
 
 def post_json(url: str, body: dict):
-    req = Request(url, json.dumps(body).encode(), {"Content-Type": "application/json"}, method="POST")
+    req = Request(url, json.dumps(body).encode(), {"Content-Type": "application/json",'X-AeroScope-Client':'http-tests'}, method="POST")
     with urlopen(req, timeout=4) as response:
         return response.status, json.loads(response.read())
 
@@ -100,6 +100,7 @@ class HttpWorkflowTests(unittest.TestCase):
     def setUp(self):
         simulator.stop(); mavlink.disconnect(); vehicle_state.reset()
         mavlink.workflows.owner=None
+        mavlink.workflows.claim('http-tests')
 
     def test_simulation_stream_and_graceful_stop(self):
         status, started = post_json(self.base + "/api/simulation", {"action":"start", "scenario":"normal", "speed":1})

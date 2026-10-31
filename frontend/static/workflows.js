@@ -64,7 +64,7 @@
  transactionPanel.onclick=e=>{const mode=e.target.dataset.flightMode;if(mode)run(async()=>{if(confirm(`Request ${mode}? This changes vehicle behavior.`))await post('/api/control/mode',{mode,confirmed:true})})};
  async function refresh(){
    try{
-    const [setup,params,control,batch,cap]=await Promise.all([A.api('/api/setup'),A.api('/api/parameters'),A.api('/api/control/status'),A.api('/api/parameters/batch'),A.api('/api/control/capabilities')]);
+    const [setup,params,control,batch,cap,actions,logs]=await Promise.all([A.api('/api/setup'),A.api('/api/parameters'),A.api('/api/control/status'),A.api('/api/parameters/batch'),A.api('/api/control/capabilities'),A.api('/api/control/actions'),A.api('/api/vehicle-logs')]);
     owner=setup.ownership.owner;$('#owner-status').textContent=owner===A.clientId?'You own vehicle controls':owner?'Another browser owns controls':'Monitor only — claim controls';
     if(owner===A.clientId)await post('/api/control/claim');
     $('#connection-summary').textContent=JSON.stringify({environment:A.telemetry?.vehicle?.simulated?'DEMO':control.connection.environment||'physical',connection:A.telemetry?.connection,session_id:control.connection.session_id,vehicle:A.telemetry?.vehicle},null,2);
@@ -76,12 +76,19 @@
     $('#calibration-status').textContent=JSON.stringify(setup.calibration,null,2);$('#calibration-position').disabled=setup.calibration.kind!=='accelerometer'||![1,2,3,4,5,6].includes(setup.calibration.position);$('#cancel-calibration').disabled=setup.calibration.kind!=='compass'||!['RUNNING','WAITING_ACK'].includes(setup.calibration.state);
     $('#readiness-messages').innerHTML=setup.messages.slice(-10).map(m=>`<p>${esc(m.text)}</p>`).join('')||'<p>No vehicle status text received. Absence of messages is not a readiness check.</p>';
     $('#transaction-rows').innerHTML=control.transactions.slice(0,30).map(t=>`<tr><td>${t.command}</td><td>${esc(t.state)} ${esc(t.result||'')}</td><td>${esc(t.detail||'')} ${t.progress??''}</td></tr>`).join('')||'<tr><td colspan="3">No commands in this session</td></tr>';
+    $('#action-observations').textContent=actions.actions.map(a=>`${a.command}: ${a.state} • ${a.observed||'No completion observation yet'}`).join('\n');
+    $('#fc-log-status').textContent=`${logs.state} • ${logs.received_bytes}/${logs.total_bytes??'?'} bytes${logs.detail?' • '+logs.detail:''}`;
+    if(document.activeElement!==$('#fc-log-select')){const selected=$('#fc-log-select').value;$('#fc-log-select').innerHTML=logs.logs.map(l=>`<option value="${l.id}">Log ${l.id} • ${(l.size/1024).toFixed(1)} KiB</option>`).join('');if(selected)$('#fc-log-select').value=selected}
+    $('#fc-log-analyze').disabled=logs.state!=='DOWNLOADED';
     for(const b of transactionPanel.querySelectorAll('[data-flight-mode]')){b.disabled=owner!==A.clientId||!(cap.capabilities?.modes||[]).includes(b.dataset.flightMode);b.title=b.disabled?'Requires control ownership and a mode reported by this firmware':''}
     $('#batch-status').textContent=JSON.stringify(batch,null,2);
     if(batch.state==='VERIFIED'){for(const r of batch.changes)if(drafts[r.name]&&Number(drafts[r.name].value)===r.after)delete drafts[r.name];saveDrafts()}
     drawConfig();
    }catch(e){$('#owner-status').textContent=e.message}
  }
+ const observations=document.createElement('pre');observations.id='action-observations';observations.className='workflow-status';transactionPanel.append(observations);
+ const logPanel=document.createElement('section');logPanel.className='panel workflow-panel';logPanel.innerHTML='<h2>Flight-controller logs</h2><p>Disarmed ArduPilot Copter only. Downloads up to 32 MiB through MAVLink LOG protocol; incomplete files cannot be analyzed.</p><div class="workflow-actions">'+button('fc-log-list','List vehicle logs')+'<select id="fc-log-select" aria-label="Vehicle log"></select>'+button('fc-log-download','Download selected')+button('fc-log-cancel','Cancel log transfer')+button('fc-log-analyze','Analyze complete download')+'</div><p id="fc-log-status">No vehicle logs listed</p>';$('#page-logs .page-heading').after(logPanel);
+ for(const [id,path] of [['fc-log-list','list'],['fc-log-download','download'],['fc-log-cancel','cancel'],['fc-log-analyze','analyze']])$('#'+id).onclick=()=>run(async()=>{const data=await post('/api/vehicle-logs/'+path,{id:Number($('#fc-log-select').value)});A.toast(path==='analyze'?'Log queued for local analysis; refresh Analyze archive':'Vehicle log '+path+' requested');await refresh()});
  saveDrafts();refresh();setInterval(refresh,2500);
  window.addEventListener('beforeunload',e=>{if(Object.keys(drafts).length||A.missionDirty){e.preventDefault();e.returnValue='Unsaved changes'}});
  window.addEventListener('hashchange',()=>{if(location.hash==='#configure')drawConfig()});

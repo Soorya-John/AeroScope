@@ -11,3 +11,4 @@ backend/tests/.test-tmp/
 .tools/
 node_modules/
 test-results/
+*.egg-info/
