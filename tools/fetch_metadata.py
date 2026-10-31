@@ -20,7 +20,7 @@ for source,prefix in sources.items():
     try: code=urlopen(url,timeout=30).read().decode()
     except Exception as exc: print(source,exc);continue
     for match in re.finditer(r'//\s*@Param(?:\{[^}]*\})?:\s*(\S+)(.*?)(?=\n\s*(?!//)\S)',code,re.S):
-        name=prefix+match[1];block=match[2]
+        name=prefix+match[1].lstrip('_');block=match[2]
         fields=dict(re.findall(r'//\s*@([A-Za-z]+):\s*([^\n\r]*)',block))
         if not fields:continue
         meta={'label':fields.get('DisplayName',name),'description':fields.get('Description',fields.get('DisplayName','')),'units':fields.get('Units',''),'reboot':fields.get('RebootRequired','').lower()=='true','source':url}

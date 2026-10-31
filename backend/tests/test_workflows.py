@@ -45,6 +45,16 @@ class WorkflowTests(unittest.TestCase):
     def test_float32_normalization_and_overflow(self):
         self.assertNotEqual(validate_parameter_value(1.234,9),1.234)
         with self.assertRaises(ValueError):validate_parameter_value(1e100,9)
+
+    def test_metadata_names_and_exact_version_boundary(self):
+        from app.metadata import parameter_metadata,validate_metadata
+        vehicle={'autopilot':{'value':'ArduPilot'},'type':{'value':'Quadrotor'},'firmware':{'value':'4.7.2.255'}}
+        metadata=parameter_metadata(vehicle)
+        self.assertIn('INS_GYRO_FILTER',metadata)
+        self.assertTrue(metadata['INS_GYRO_FILTER']['description'])
+        validate_metadata(20,metadata['INS_GYRO_FILTER'])
+        vehicle['firmware']['value']='4.7.1.255'
+        self.assertEqual(parameter_metadata(vehicle),{})
     def test_log_out_of_order_duplicate_and_cancel(self):
         log=VehicleLogs();log.begin_session('test');log.list_started()
         log.ingest(SimpleNamespace(get_type=lambda:'LOG_ENTRY',num_logs=1,id=7,size=181,time_utc=0))

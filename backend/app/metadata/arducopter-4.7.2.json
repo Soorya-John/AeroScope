@@ -1226,28 +1226,28 @@
         5000.0
       ]
     },
-    "INS__GYROFFS_X": {
+    "INS_GYROFFS_X": {
       "label": "Gyro offsets of Z axis",
       "description": "Gyro sensor offsets of Z axis. This is setup on each boot during gyro calibrations",
       "units": "rad/s",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
-    "INS__GYR2OFFS_X": {
+    "INS_GYR2OFFS_X": {
       "label": "Gyro2 offsets of Z axis",
       "description": "Gyro2 sensor offsets of Z axis. This is setup on each boot during gyro calibrations",
       "units": "rad/s",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
-    "INS__GYR3OFFS_X": {
+    "INS_GYR3OFFS_X": {
       "label": "Gyro3 offsets of Z axis",
       "description": "Gyro3 sensor offsets of Z axis. This is setup on each boot during gyro calibrations",
       "units": "rad/s",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
-    "INS__ACCSCAL_X": {
+    "INS_ACCSCAL_X": {
       "label": "Accelerometer scaling of Z axis",
       "description": "Accelerometer scaling of Z axis  Calculated during acceleration calibration routine",
       "units": "",
@@ -1258,7 +1258,7 @@
         1.2
       ]
     },
-    "INS__ACCOFFS_X": {
+    "INS_ACCOFFS_X": {
       "label": "Accelerometer offsets of Z axis",
       "description": "Accelerometer offsets of Z axis. This is setup using the acceleration calibration or level operations",
       "units": "m/s/s",
@@ -1269,7 +1269,7 @@
         3.5
       ]
     },
-    "INS__ACC2SCAL_X": {
+    "INS_ACC2SCAL_X": {
       "label": "Accelerometer2 scaling of Z axis",
       "description": "Accelerometer2 scaling of Z axis  Calculated during acceleration calibration routine",
       "units": "",
@@ -1280,7 +1280,7 @@
         1.2
       ]
     },
-    "INS__ACC2OFFS_X": {
+    "INS_ACC2OFFS_X": {
       "label": "Accelerometer2 offsets of Z axis",
       "description": "Accelerometer2 offsets of Z axis. This is setup using the acceleration calibration or level operations",
       "units": "m/s/s",
@@ -1291,7 +1291,7 @@
         3.5
       ]
     },
-    "INS__ACC3SCAL_X": {
+    "INS_ACC3SCAL_X": {
       "label": "Accelerometer3 scaling of Z axis",
       "description": "Accelerometer3 scaling of Z axis  Calculated during acceleration calibration routine",
       "units": "",
@@ -1302,7 +1302,7 @@
         1.2
       ]
     },
-    "INS__ACC3OFFS_X": {
+    "INS_ACC3OFFS_X": {
       "label": "Accelerometer3 offsets of Z axis",
       "description": "Accelerometer3 offsets of Z axis. This is setup using the acceleration calibration or level operations",
       "units": "m/s/s",
@@ -1313,7 +1313,7 @@
         3.5
       ]
     },
-    "INS__GYRO_FILTER": {
+    "INS_GYRO_FILTER": {
       "label": "Gyro filter cutoff frequency",
       "description": "Filter cutoff frequency for gyroscopes. This can be set to a lower value to try to cope with very high vibration levels in aircraft. A value of zero means no filtering (not recommended!)",
       "units": "Hz",
@@ -1324,7 +1324,7 @@
         256.0
       ]
     },
-    "INS__ACCEL_FILTER": {
+    "INS_ACCEL_FILTER": {
       "label": "Accel filter cutoff frequency",
       "description": "Filter cutoff frequency for accelerometers. This can be set to a lower value to try to cope with very high vibration levels in aircraft. A value of zero means no filtering (not recommended!)",
       "units": "Hz",
@@ -1335,7 +1335,7 @@
         256.0
       ]
     },
-    "INS__USE": {
+    "INS_USE": {
       "label": "Use first IMU for attitude, velocity and position estimates",
       "description": "Use first IMU for attitude, velocity and position estimates",
       "units": "",
@@ -1346,7 +1346,7 @@
         "1": "Enabled"
       }
     },
-    "INS__USE2": {
+    "INS_USE2": {
       "label": "Use second IMU for attitude, velocity and position estimates",
       "description": "Use second IMU for attitude, velocity and position estimates",
       "units": "",
@@ -1357,7 +1357,7 @@
         "1": "Enabled"
       }
     },
-    "INS__USE3": {
+    "INS_USE3": {
       "label": "Use third IMU for attitude, velocity and position estimates",
       "description": "Use third IMU for attitude, velocity and position estimates",
       "units": "",
@@ -1368,7 +1368,7 @@
         "1": "Enabled"
       }
     },
-    "INS__STILL_THRESH": {
+    "INS_STILL_THRESH": {
       "label": "Stillness threshold for detecting if we are moving",
       "description": "Threshold to tolerate vibration to determine if vehicle is motionless. This depends on the frame type and if there is a constant vibration due to motors before launch or after landing. Total motionless is about 0.05. Suggested values: Planes/rover use 0.1, multirotors use 1, tradHeli uses 5",
       "units": "",
@@ -1379,7 +1379,7 @@
         50.0
       ]
     },
-    "INS__GYR_CAL": {
+    "INS_GYR_CAL": {
       "label": "Gyro Calibration scheme",
       "description": "Conrols when automatic gyro calibration is performed",
       "units": "",
@@ -1390,7 +1390,7 @@
         "1": "Start-up only"
       }
     },
-    "INS__TRIM_OPTION": {
+    "INS_TRIM_OPTION": {
       "label": "Accel cal trim option",
       "description": "Specifies how the accel cal routine determines the trims",
       "units": "",
@@ -1402,7 +1402,7 @@
         "2": "Assume ACC_BODYFIX is perfectly aligned to the vehicle"
       }
     },
-    "INS__ACC_BODYFIX": {
+    "INS_ACC_BODYFIX": {
       "label": "Body-fixed accelerometer",
       "description": "The body-fixed accelerometer to be used for trim calculation",
       "units": "",
@@ -1414,7 +1414,7 @@
         "3": "IMU 3"
       }
     },
-    "INS__POS1_X": {
+    "INS_POS1_X": {
       "label": "IMU accelerometer Z position",
       "description": "Z position of the first IMU accelerometer in body frame. Positive Z is down from the origin. Attention: The IMU should be located as close to the vehicle c.g. as practical so that the value of this parameter is minimised. Failure to do so can result in noisy navigation velocity measurements due to vibration and IMU gyro noise. If the IMU cannot be moved and velocity noise is a problem, a location closer to the IMU can be used as the body frame origin.",
       "units": "m",
@@ -1425,7 +1425,7 @@
         5.0
       ]
     },
-    "INS__POS2_X": {
+    "INS_POS2_X": {
       "label": "IMU accelerometer Z position",
       "description": "Z position of the second IMU accelerometer in body frame. Positive Z is down from the origin. Attention: The IMU should be located as close to the vehicle c.g. as practical so that the value of this parameter is minimised. Failure to do so can result in noisy navigation velocity measurements due to vibration and IMU gyro noise. If the IMU cannot be moved and velocity noise is a problem, a location closer to the IMU can be used as the body frame origin.",
       "units": "m",
@@ -1436,7 +1436,7 @@
         5.0
       ]
     },
-    "INS__POS3_X": {
+    "INS_POS3_X": {
       "label": "IMU accelerometer Z position",
       "description": "Z position of the third IMU accelerometer in body frame. Positive Z is down from the origin. Attention: The IMU should be located as close to the vehicle c.g. as practical so that the value of this parameter is minimised. Failure to do so can result in noisy navigation velocity measurements due to vibration and IMU gyro noise. If the IMU cannot be moved and velocity noise is a problem, a location closer to the IMU can be used as the body frame origin.",
       "units": "m",
@@ -1447,63 +1447,63 @@
         5.0
       ]
     },
-    "INS__GYR_ID": {
+    "INS_GYR_ID": {
       "label": "Gyro ID",
       "description": "Gyro sensor ID, taking into account its type, bus and instance",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
-    "INS__GYR2_ID": {
+    "INS_GYR2_ID": {
       "label": "Gyro2 ID",
       "description": "Gyro2 sensor ID, taking into account its type, bus and instance",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
-    "INS__GYR3_ID": {
+    "INS_GYR3_ID": {
       "label": "Gyro3 ID",
       "description": "Gyro3 sensor ID, taking into account its type, bus and instance",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
-    "INS__ACC_ID": {
+    "INS_ACC_ID": {
       "label": "Accelerometer ID",
       "description": "Accelerometer sensor ID, taking into account its type, bus and instance",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
-    "INS__ACC2_ID": {
+    "INS_ACC2_ID": {
       "label": "Accelerometer2 ID",
       "description": "Accelerometer2 sensor ID, taking into account its type, bus and instance",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
-    "INS__ACC3_ID": {
+    "INS_ACC3_ID": {
       "label": "Accelerometer3 ID",
       "description": "Accelerometer3 sensor ID, taking into account its type, bus and instance",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
-    "INS__FAST_SAMPLE": {
+    "INS_FAST_SAMPLE": {
       "label": "Fast sampling mask",
       "description": "Mask of IMUs to enable fast sampling on, if available",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
-    "INS__ENABLE_MASK": {
+    "INS_ENABLE_MASK": {
       "label": "IMU enable mask",
       "description": "Bitmask of IMUs to enable. It can be used to prevent startup of specific detected IMUs",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
-    "INS__GYRO_RATE": {
+    "INS_GYRO_RATE": {
       "label": "Gyro rate for IMUs with Fast Sampling enabled",
       "description": "Gyro rate for IMUs with fast sampling enabled. The gyro rate is the sample rate at which the IMU filters operate and needs to be at least double the maximum filter frequency. If the sensor does not support the selected rate the next highest supported rate will be used. For IMUs which do not support fast sampling this setting is ignored and the default gyro rate of 1Khz is used.",
       "units": "",
@@ -1516,56 +1516,56 @@
         "3": "8kHz"
       }
     },
-    "INS__ACC1_CALTEMP": {
+    "INS_ACC1_CALTEMP": {
       "label": "Calibration temperature for 1st accelerometer",
       "description": "Temperature that the 1st accelerometer was calibrated at",
       "units": "degC",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
-    "INS__GYR1_CALTEMP": {
+    "INS_GYR1_CALTEMP": {
       "label": "Calibration temperature for 1st gyroscope",
       "description": "Temperature that the 1st gyroscope was calibrated at",
       "units": "degC",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
-    "INS__ACC2_CALTEMP": {
+    "INS_ACC2_CALTEMP": {
       "label": "Calibration temperature for 2nd accelerometer",
       "description": "Temperature that the 2nd accelerometer was calibrated at",
       "units": "degC",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
-    "INS__GYR2_CALTEMP": {
+    "INS_GYR2_CALTEMP": {
       "label": "Calibration temperature for 2nd gyroscope",
       "description": "Temperature that the 2nd gyroscope was calibrated at",
       "units": "degC",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
-    "INS__ACC3_CALTEMP": {
+    "INS_ACC3_CALTEMP": {
       "label": "Calibration temperature for 3rd accelerometer",
       "description": "Temperature that the 3rd accelerometer was calibrated at",
       "units": "degC",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
-    "INS__GYR3_CALTEMP": {
+    "INS_GYR3_CALTEMP": {
       "label": "Calibration temperature for 3rd gyroscope",
       "description": "Temperature that the 3rd gyroscope was calibrated at",
       "units": "degC",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
-    "INS__TCAL_OPTIONS": {
+    "INS_TCAL_OPTIONS": {
       "label": "Options for temperature calibration",
       "description": "This enables optional temperature calibration features. Setting of the Persist bits will save the temperature and/or accelerometer calibration parameters in the bootloader sector on the next update of the bootloader.",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_InertialSensor/AP_InertialSensor.cpp"
     },
-    "INS__RAW_LOG_OPT": {
+    "INS_RAW_LOG_OPT": {
       "label": "Raw logging options",
       "description": "Raw logging options bitmask",
       "units": "",
@@ -1640,7 +1640,7 @@
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_BattMonitor/AP_BattMonitor_Analog.cpp"
     },
-    "GPS__NAVFILTER": {
+    "GPS_NAVFILTER": {
       "label": "Navigation filter setting",
       "description": "Navigation filter engine setting",
       "units": "",
@@ -1657,7 +1657,7 @@
         "8": "Airborne4G"
       }
     },
-    "GPS__AUTO_SWITCH": {
+    "GPS_AUTO_SWITCH": {
       "label": "Automatic Switchover Setting",
       "description": "Automatic switchover to GPS reporting best lock, 1:UseBest selects the GPS with highest status, if both are equal the GPS with highest satellite count is used 4:Use primary if 3D fix or better, will revert to 'UseBest' behaviour if 3D fix is lost on primary",
       "units": "",
@@ -1670,7 +1670,7 @@
         "4": "Use primary if 3D fix or better"
       }
     },
-    "GPS__SBAS_MODE": {
+    "GPS_SBAS_MODE": {
       "label": "SBAS Mode",
       "description": "This sets the SBAS (satellite based augmentation system) mode if available on this GPS. If set to 2 then the SBAS mode is not changed in the GPS. Otherwise the GPS will be reconfigured to enable/disable SBAS. Disabling SBAS may be worthwhile in some parts of the world where an SBAS signal is available but the baseline is too long to be useful.",
       "units": "",
@@ -1682,7 +1682,7 @@
         "2": "NoChange"
       }
     },
-    "GPS__MIN_ELEV": {
+    "GPS_MIN_ELEV": {
       "label": "Minimum elevation",
       "description": "This sets the minimum elevation of satellites above the horizon for them to be used for navigation. Setting this to -100 leaves the minimum elevation set to the GPS modules default.",
       "units": "deg",
@@ -1693,7 +1693,7 @@
         90.0
       ]
     },
-    "GPS__INJECT_TO": {
+    "GPS_INJECT_TO": {
       "label": "Destination for GPS_INJECT_DATA MAVLink packets",
       "description": "The GGS can send raw serial packets to inject data to multiple GPSes.",
       "units": "",
@@ -1705,7 +1705,7 @@
         "127": "send to all"
       }
     },
-    "GPS__SBP_LOGMASK": {
+    "GPS_SBP_LOGMASK": {
       "label": "Swift Binary Protocol Logging Mask",
       "description": "Masked with the SBP msg_type field to determine whether SBR1/SBR2 data is logged",
       "units": "",
@@ -1717,7 +1717,7 @@
         "-256": "External only (0xFF00)"
       }
     },
-    "GPS__RAW_DATA": {
+    "GPS_RAW_DATA": {
       "label": "Raw data logging",
       "description": "Handles logging raw data; on uBlox chips that support raw data this will log RXM messages into logger; on Septentrio this will log on the equipment's SD card and when set to 2, the autopilot will try to stop logging after disarming and restart after arming",
       "units": "",
@@ -1730,7 +1730,7 @@
         "5": "Only log every five samples (uBlox only)"
       }
     },
-    "GPS__SAVE_CFG": {
+    "GPS_SAVE_CFG": {
       "label": "Save GPS configuration",
       "description": "Determines whether the configuration for this GPS should be written to non-volatile memory on the GPS. Currently working for UBlox 6 series and above.",
       "units": "",
@@ -1742,7 +1742,7 @@
         "2": "Save only when needed"
       }
     },
-    "GPS__AUTO_CONFIG": {
+    "GPS_AUTO_CONFIG": {
       "label": "Automatic GPS configuration",
       "description": "Controls if the autopilot should automatically configure the GPS based on the parameters and default settings",
       "units": "",
@@ -1755,14 +1755,14 @@
         "3": "Clear all configurations not set by ardupilot (UBlox only)"
       }
     },
-    "GPS__BLEND_MASK": {
+    "GPS_BLEND_MASK": {
       "label": "Multi GPS Blending Mask",
       "description": "Determines which of the accuracy measures Horizontal position, Vertical Position and Speed are used to calculate the weighting on each GPS receiver when soft switching has been selected by setting GPS_AUTO_SWITCH to 2(Blend)",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_GPS/AP_GPS.cpp"
     },
-    "GPS__BLEND_TC": {
+    "GPS_BLEND_TC": {
       "label": "Blending time constant",
       "description": "Controls the slowest time constant applied to the calculation of GPS position and height offsets used to adjust different GPS receivers for steady state position differences.",
       "units": "s",
@@ -1773,14 +1773,14 @@
         30.0
       ]
     },
-    "GPS__DRV_OPTIONS": {
+    "GPS_DRV_OPTIONS": {
       "label": "driver options",
       "description": "Additional backend specific options",
       "units": "",
       "reboot": false,
       "source": "https://raw.githubusercontent.com/ArduPilot/ardupilot/fbd0a3160c90a557c24ce4c38c16975532652536/libraries/AP_GPS/AP_GPS.cpp"
     },
-    "GPS__PRIMARY": {
+    "GPS_PRIMARY": {
       "label": "Primary GPS",
       "description": "This GPS will be used when GPS_AUTO_SWITCH is 0 and used preferentially with GPS_AUTO_SWITCH = 4.",
       "units": "",
@@ -1791,7 +1791,7 @@
         "1": "SecondGPS"
       }
     },
-    "GPS__TYPE": {
+    "GPS_TYPE": {
       "label": "GPS Node ID 2",
       "description": "GPS Node id for second-discovered GPS.Renamed in 4.6 and later to GPS2_CAN_NODEID.",
       "units": "ms",

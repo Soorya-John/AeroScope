@@ -1,0 +1,480 @@
+{
+  "binary_source": "CopterStable",
+  "git": "commit fbd0a3160c90a557c24ce4c38c16975532652536\nAuthor: Andrew Tridgell <andrew@tridgell.net>\nDate:   Sat Oct 3 17:20:32 2026 +1000\n\n    AP_BoardConfig: use atomic pin mode change for debug pins\n    \n    board_init_debug() runs after other threads have started, so use\n    stm32_set_line_mode() to avoid racing other pin mode changes on the\n    same port\n",
+  "results": [
+    {
+      "check": "Connect and version",
+      "result": "PASS",
+      "data": {
+        "name": "Vehicle 1",
+        "type": {
+          "value": "Quadrotor",
+          "available": true,
+          "source": "MAVLink",
+          "received_at": "2026-10-31T16:21:49.878Z",
+          "age_s": 0.2,
+          "fresh": true
+        },
+        "autopilot": {
+          "value": "ArduPilot",
+          "available": true,
+          "source": "MAVLink",
+          "received_at": "2026-10-31T16:21:49.878Z",
+          "age_s": 0.2,
+          "fresh": true
+        },
+        "firmware": {
+          "value": "4.7.2.255",
+          "available": true,
+          "source": "MAVLink",
+          "received_at": "2026-10-31T16:21:49.920Z",
+          "age_s": 0.2,
+          "fresh": true
+        },
+        "firmware_details": {
+          "flight_version": "4.7.2.255",
+          "middleware_sw_version": 0,
+          "os_sw_version": 0,
+          "board_version": 0,
+          "flight_custom_version": "6662643061333136",
+          "middleware_custom_version": null,
+          "os_custom_version": null,
+          "vendor_id": 0,
+          "product_id": 0
+        },
+        "protocol_capabilities": {
+          "value": 64495,
+          "available": true,
+          "source": "MAVLink",
+          "received_at": "2026-10-31T16:21:49.920Z",
+          "age_s": 0.2,
+          "fresh": true
+        },
+        "mavlink_version": {
+          "value": 2,
+          "available": true,
+          "source": "MAVLink",
+          "received_at": "2026-10-31T16:21:49.878Z",
+          "age_s": 0.2,
+          "fresh": true
+        },
+        "system_id": {
+          "value": 1,
+          "available": true,
+          "source": "MAVLink",
+          "received_at": "2026-10-31T16:21:49.920Z",
+          "age_s": 0.2,
+          "fresh": true
+        },
+        "component_id": {
+          "value": 1,
+          "available": true,
+          "source": "MAVLink",
+          "received_at": "2026-10-31T16:21:49.920Z",
+          "age_s": 0.2,
+          "fresh": true
+        },
+        "simulated": false,
+        "identity_warning": null
+      }
+    },
+    {
+      "check": "Parameter download",
+      "result": "PASS",
+      "data": {
+        "received": 1370,
+        "count": 1370,
+        "complete": true,
+        "recovery_round": 0,
+        "elapsed_s": 1.2,
+        "error": null
+      }
+    },
+    {
+      "check": "Staged write and independent readback",
+      "result": "PASS",
+      "data": {
+        "id": "a8a6cb57-7b44-4549-a79a-2363a1c215aa",
+        "session_id": "1a98598f-eb9a-46a5-92cd-b947412d176a",
+        "state": "VERIFIED",
+        "changes": [
+          {
+            "name": "INS_GYRO_FILTER",
+            "before": 20,
+            "after": 21,
+            "type": 4,
+            "state": "VERIFIED",
+            "detail": null
+          }
+        ],
+        "atomic": false
+      }
+    },
+    {
+      "check": "Restore original parameter",
+      "result": "PASS",
+      "data": {
+        "id": "6b7ee565-0c3a-49b0-aab2-6d5a786071a2",
+        "session_id": "1a98598f-eb9a-46a5-92cd-b947412d176a",
+        "state": "VERIFIED",
+        "changes": [
+          {
+            "name": "INS_GYRO_FILTER",
+            "before": 21,
+            "after": 20,
+            "type": 4,
+            "state": "VERIFIED",
+            "detail": null
+          }
+        ],
+        "atomic": false
+      }
+    },
+    {
+      "check": "Backup export",
+      "result": "PASS",
+      "data": null
+    },
+    {
+      "check": "Gyro calibration result",
+      "result": "PASS",
+      "data": {
+        "kind": "gyro",
+        "state": "SUCCEEDED",
+        "transaction_id": "454c0034-6255-4e22-b946-cb58da30a613",
+        "session_id": "1a98598f-eb9a-46a5-92cd-b947412d176a",
+        "progress": null,
+        "instruction": "Follow vehicle prompts; keep still for gyro/level/barometer. Rotate all axes for compass."
+      }
+    },
+    {
+      "check": "Bounded motor-test protocol response (SITL only)",
+      "result": "PASS",
+      "data": {
+        "id": "d40bf193-38bf-41c0-aa74-baa8ae02046a",
+        "session_id": "1a98598f-eb9a-46a5-92cd-b947412d176a",
+        "command": 209,
+        "target_system": 1,
+        "target_component": 1,
+        "state": "SUCCEEDED",
+        "progress": 0,
+        "result": "ACCEPTED",
+        "detail": 0,
+        "retries": 0
+      }
+    },
+    {
+      "check": "Actual autopilot unsupported-command rejection",
+      "result": "PASS",
+      "data": {
+        "id": "21d3ffcb-57c5-402c-82b7-342e431f9628",
+        "session_id": "1a98598f-eb9a-46a5-92cd-b947412d176a",
+        "command": 65534,
+        "target_system": 1,
+        "target_component": 1,
+        "state": "FAILED",
+        "progress": null,
+        "result": "UNSUPPORTED",
+        "detail": 0,
+        "retries": 0
+      }
+    },
+    {
+      "check": "Mission upload",
+      "result": "PASS",
+      "data": {
+        "protocol_version": 1,
+        "mission_id": "ce0a27e1-5ab7-434f-ad4f-065f28d48ba5",
+        "state": "SUCCEEDED",
+        "items": [
+          {
+            "seq": 0,
+            "frame": 6,
+            "command": 16,
+            "current": 0,
+            "autocontinue": 1,
+            "param1": 0.0,
+            "param2": 0.0,
+            "param3": 0.0,
+            "param4": 0.0,
+            "latitude": -35.363261,
+            "longitude": 149.16523,
+            "altitude": 0.0
+          },
+          {
+            "seq": 1,
+            "frame": 6,
+            "command": 22,
+            "current": 0,
+            "autocontinue": 1,
+            "param1": 0.0,
+            "param2": 0.0,
+            "param3": 0.0,
+            "param4": 0.0,
+            "latitude": -35.363261,
+            "longitude": 149.16523,
+            "altitude": 10.0
+          },
+          {
+            "seq": 2,
+            "frame": 6,
+            "command": 16,
+            "current": 0,
+            "autocontinue": 1,
+            "param1": 0.0,
+            "param2": 0.0,
+            "param3": 0.0,
+            "param4": 0.0,
+            "latitude": -35.3631,
+            "longitude": 149.1653,
+            "altitude": 10.0
+          },
+          {
+            "seq": 3,
+            "frame": 2,
+            "command": 20,
+            "current": 0,
+            "autocontinue": 1,
+            "param1": 0.0,
+            "param2": 0.0,
+            "param3": 0.0,
+            "param4": 0.0,
+            "latitude": 0.0,
+            "longitude": 0.0,
+            "altitude": 0.0
+          }
+        ],
+        "received_sequences": [],
+        "progress": {
+          "received": 4,
+          "total": 4,
+          "current": 0,
+          "reached": [],
+          "execution_state": 2
+        },
+        "detail": null,
+        "session_id": "1a98598f-eb9a-46a5-92cd-b947412d176a"
+      }
+    },
+    {
+      "check": "Mission download round trip (home slot excluded)",
+      "result": "PASS",
+      "data": {
+        "protocol_version": 1,
+        "mission_id": "78e53f9a-26ff-461e-9f9d-3d4fdd35133d",
+        "state": "SUCCEEDED",
+        "items": [
+          {
+            "seq": 0,
+            "frame": 5,
+            "command": 16,
+            "current": 0,
+            "autocontinue": 1,
+            "param1": 0.0,
+            "param2": 0.0,
+            "param3": 0.0,
+            "param4": 0.0,
+            "latitude": 0.0,
+            "longitude": 0.0,
+            "altitude": 0.0
+          },
+          {
+            "seq": 1,
+            "frame": 6,
+            "command": 22,
+            "current": 0,
+            "autocontinue": 1,
+            "param1": 0.0,
+            "param2": 0.0,
+            "param3": 0.0,
+            "param4": 0.0,
+            "latitude": -35.363261,
+            "longitude": 149.16523,
+            "altitude": 10.0
+          },
+          {
+            "seq": 2,
+            "frame": 6,
+            "command": 16,
+            "current": 0,
+            "autocontinue": 1,
+            "param1": 0.0,
+            "param2": 0.0,
+            "param3": 0.0,
+            "param4": 0.0,
+            "latitude": -35.3631,
+            "longitude": 149.1653,
+            "altitude": 10.0
+          },
+          {
+            "seq": 3,
+            "frame": 5,
+            "command": 20,
+            "current": 0,
+            "autocontinue": 1,
+            "param1": 0.0,
+            "param2": 0.0,
+            "param3": 0.0,
+            "param4": 0.0,
+            "latitude": 0.0,
+            "longitude": 0.0,
+            "altitude": 0.0
+          }
+        ],
+        "received_sequences": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "progress": {
+          "received": 4,
+          "total": 4,
+          "current": 0,
+          "reached": [],
+          "execution_state": 2
+        },
+        "detail": null,
+        "session_id": "1a98598f-eb9a-46a5-92cd-b947412d176a"
+      }
+    },
+    {
+      "check": "Mission clear and empty download",
+      "result": "PASS",
+      "data": null
+    },
+    {
+      "check": "Mode observed GUIDED",
+      "result": "PASS",
+      "data": null
+    },
+    {
+      "check": "Arm ACK and observed state",
+      "result": "PASS",
+      "data": null
+    },
+    {
+      "check": "Takeoff observed above 4m",
+      "result": "PASS",
+      "data": null
+    },
+    {
+      "check": "COMMAND_INT guided reposition observed",
+      "result": "PASS",
+      "data": {
+        "transaction_id": "62e3fb9c-b1fd-416a-8a57-2a4f2f26fd3d",
+        "session_id": "1a98598f-eb9a-46a5-92cd-b947412d176a",
+        "command": 192,
+        "params": [
+          -1.0,
+          0.0,
+          0.0,
+          0.0,
+          -35.36323,
+          149.16526,
+          5.0
+        ],
+        "state": "OBSERVED",
+        "observed": "2.6 m from requested position, relative altitude 5.1 m"
+      }
+    },
+    {
+      "check": "Pause via observed BRAKE mode",
+      "result": "PASS",
+      "data": null
+    },
+    {
+      "check": "RTL heartbeat",
+      "result": "PASS",
+      "data": null
+    },
+    {
+      "check": "RTL landing and disarm observed",
+      "result": "PASS",
+      "data": null
+    },
+    {
+      "check": "Flight-controller log listing",
+      "result": "PASS",
+      "data": {
+        "session_id": "1a98598f-eb9a-46a5-92cd-b947412d176a",
+        "state": "SUCCEEDED",
+        "detail": null,
+        "logs": [
+          {
+            "id": 1,
+            "size": 4915200,
+            "time_utc": 1793463825
+          }
+        ],
+        "log_id": null,
+        "received_bytes": 0,
+        "total_bytes": null
+      }
+    },
+    {
+      "check": "Complete controller log download",
+      "result": "PASS",
+      "data": {
+        "session_id": "1a98598f-eb9a-46a5-92cd-b947412d176a",
+        "state": "DOWNLOADED",
+        "detail": null,
+        "logs": [
+          {
+            "id": 1,
+            "size": 4915200,
+            "time_utc": 1793463825
+          }
+        ],
+        "log_id": 1,
+        "received_bytes": 4915200,
+        "total_bytes": 4915200
+      }
+    },
+    {
+      "check": "Downloaded controller log parsed as DataFlash",
+      "result": "PASS",
+      "data": {
+        "id": "bdeba709-05d9-4662-a83f-0d0bebb13de3",
+        "summary": {
+          "record_count": 122185,
+          "duration_s": 113.46,
+          "max_altitude_m": 599.08,
+          "max_altitude_reference": null,
+          "max_relative_altitude_m": 15.022420883178711,
+          "max_relative_altitude_reference": "CTUN/local position relative altitude",
+          "max_speed_m_s": 2.9760000705718994,
+          "max_speed_reference": "GPS/DataFlash speed",
+          "max_current_a": 39.98544692993164,
+          "min_voltage_v": 12.600000381469727,
+          "flight_modes": [
+            "BRAKE",
+            "GUIDED",
+            "RTL",
+            "STABILIZE",
+            "UNKNOWN"
+          ],
+          "data_fields": [
+            "actuator_outputs",
+            "current_a",
+            "latitude_deg",
+            "longitude_deg",
+            "pitch_deg",
+            "rc_inputs",
+            "roll_deg",
+            "vibration",
+            "voltage_v",
+            "yaw_deg"
+          ],
+          "gps_path_points": 639,
+          "time_source": "embedded record timestamps"
+        }
+      }
+    },
+    {
+      "check": "Disconnect/reconnect new session without queued command replay",
+      "result": "PASS",
+      "data": null
+    }
+  ]
+}

@@ -1,31 +1,75 @@
-# AeroScope task tracker
+# AeroScope milestones and remaining work
 
-## Delivered in this workspace
+Updated 2026-10-31. A checked implementation item does not imply hardware qualification. Evidence is in VERIFICATION.md, SITL_RESULTS.json and ULOG_RESULTS.json.
 
-- [x] Inspect repository and runtime; confirm initially empty workspace, Python/Git/pymavlink availability, and missing Node/npm, FastAPI/Uvicorn, pyulog, and package-index access.
-- [x] Establish Python backend, static frontend, development scripts, local configuration, SQLite storage, and a documented structure.
-- [x] Implement responsive dashboard/navigation, live status and unavailable states, simulator controls, Canvas attitude and telemetry views, local GPS track plot, logs/replay, diagnostics, inspector, profiles, and settings.
-- [x] Implement deterministic simulator scenarios through the shared normalizer, state, WebSocket, and event paths.
-- [x] Implement a single pymavlink reader for UDP listener, serial, and TCP client, normalized selected messages, heartbeat timeout, stale status, and reconnect handling.
-- [x] Implement bounded WebSocket broadcasts, inspector, graph history, telemetry recorder, local exports, and persisted events/profiles/analysis metadata.
-- [x] Implement content-signature upload validation, bounded background analysis, pymavlink DataFlash parsing, optional pyulog-based ULog adapter, selected metrics/findings, and replay data.
-- [x] Add `unittest` coverage for core normalization/events/storage/parser/simulation/HTTP/WebSocket behavior.
-- [x] Write setup, API, configuration, simulator, parser scope, connection, SITL, security, known-limitations, and troubleshooting documentation.
-- [x] Run the backend tests (18 passing), Python compile check, JavaScript parse check, and final local HTTP/simulator smoke check.
-- [x] Initialize Git for the new workspace. Final local smoke check: `/api/health` returned `ok`; dashboard and JS assets were served; battery-sag simulation reported `connected`, `simulated=true`, and 33 decoded messages; simulation stop returned `running=false`.
+## 1. Audit and reliability
 
-## Remaining work / environmental limits
+- [x] Read actual backend/frontend/tests and preserve inherited uncommitted work.
+- [x] Baseline: 35 tests, 34 passed and one HTTP connection-abort error. Rechecked tooling rather than inheriting old environment limitations.
+- [x] Keep one reader and serialized writer; bound the outbound queue and histories.
+- [x] Exact target selection, source/destination filtering, session invalidation, cancellation generations, immediate ACK handling and stale-operation rejection.
+- [x] Fix ignored JSON bodies poisoning persistent HTTP connections; add regression coverage.
+- [x] Shared stdlib/FastAPI service instances, structured errors, ownership lease and optional-transport checks.
+- [x] Never replay flight commands or permit same-session repeats after an uncertain ACK.
+- [ ] Broader lossy-link integration campaigns: packet reordering, port failures, long-duration soak and MAVLink signing.
 
-- [ ] Replace the dependency-free static UI with React + TypeScript + Vite + Tailwind, then run a production frontend build and browser workflow tests. Node/npm and a browser were unavailable here.
-- [ ] Upgrade map plot to MapLibre with a configured, permitted map style and offline behavior.
-- [ ] Verify optional FastAPI transport after installing FastAPI/Uvicorn; this environment lacked those packages.
-- [ ] Install pyulog and validate the ULog adapter against a redistributable, generated or authorized real ULog fixture.
-- [ ] Validate serial, UDP, and TCP connection behavior against ArduPilot/PX4 SITL and hardware in a safe bench setup.
-- [ ] Broaden firmware-specific DataFlash/ULog field coverage and diagnostic calibration with supported reference logs.
-- [ ] Add browser-level component and end-to-end tests when a supported frontend toolchain is available.
+## 2. Copter connection, configuration and setup
 
-## Notes
+- [x] Serial discovery/baud, UDP listener, TCP client, exact IDs, version/capability and environment display.
+- [x] Copter 4.7.2 real Windows SITL connection, complete 1,370-parameter download and missing-index recovery state machine.
+- [x] Cast/bytewise codec separation, float32 normalization, type/range/enum validation where metadata exists.
+- [x] Persistent pending UI edits, staged review, sequential apply, confirmed echo plus independent readback, partial-failure/cancel states.
+- [x] Backup export, local snapshots/comparison and restore-to-staged-diff workflow; CSV exports on both transports.
+- [x] Friendly live parameter groups and partial version-pinned metadata (203 definitions).
+- [x] Setup prerequisites; gyro/barometer/level/compass/six-side accelerometer workflows; bench interlocks and bounded motor test.
+- [x] SITL confirms gyro result and motor-test acceptance with normal firmware checks.
+- [ ] Physical sensor-motion qualification for compass, level, barometer and six-side calibration, including all compass combinations and cancellation.
+- [ ] Dedicated receiver endpoint capture/calibration wizard (receiver parameters are currently editable).
+- [ ] Complete metadata coverage, firmware hash matching beyond version, additional firmware versions and qualified PARAM_EXT adapters.
+- [ ] Physical serial/USB reconnection and motor/output mapping qualification; no hardware operations were sent during development.
 
-- The app currently favors a working stdlib service and dependency-free browser UI so it can run in the provided environment. README lists this explicit deviation from the requested production stack; do not mark the project as meeting the React/Vite/MapLibre acceptance items until those are implemented and verified.
-- Test-generated temporary folders under `backend/tests/.test-tmp/` are ignored by Git. Several inherited temporary folders were not readable through the current Windows filesystem ACL, so they were left in place.
-- No flight-control commands are implemented or sent.
+## 3. Geographic missions
+
+- [x] Vendored geographic map, optional attributed OSM tiles, usable offline coordinates/routes.
+- [x] Add/drag/reorder/delete, command parameter labels, metre/altitude references, validation and qualified route distance.
+- [x] QGC WPL 110/items JSON import/export; reject unsupported items without dropping data.
+- [x] Real Copter upload/download/clear/empty download; integer precision, request recovery, duplicate handling, cancellation and round-trip comparison.
+- [x] Browser → HTTP → protocol → Copter mission transfer verified.
+- [x] Rectangular survey preview after core transfer verification.
+- [ ] Fence/rally data transfer (kept separate and explicitly unavailable).
+- [ ] Polygon surveys, camera footprint/overlap, terrain clearance, obstacle checks, geographic flight-log basemap and offline tile bundles.
+- [ ] Camera hardware and all supported mission commands individually exercised; current round trip uses takeoff/waypoint/RTL subset.
+
+## 4. Flight operations
+
+- [x] Telemetry freshness/unknown states, status/pre-arm messages, firmware mode mapping, normal arm/disarm and guided controls.
+- [x] Separate ACK transaction history and observed action criteria; explicit control ownership across browser clients.
+- [x] Real Copter SITL normal arm, takeoff, COMMAND_INT reposition, BRAKE, RTL, observed landing/disarm and reconnect.
+- [x] Actual unsupported-command rejection tested without weakening arming checks.
+- [ ] Separate direct LAND command, speed-achievement and mission AUTO/resume acceptance campaigns; these are implemented but not independently SITL-qualified here.
+- [ ] Systematic flight-command timeout/disconnect/late-response campaigns against autopilot SITL; deterministic/unit regressions cover these state-machine cases only.
+
+## 5. Logs and maintenance
+
+- [x] Preserve linked DataFlash/ULog analysis, events/replay/exports and missing-data explanations.
+- [x] Run public upstream ULog through pyulog 1.3.0; fix relative-altitude initialization and stale setpoint matching; bound selected records.
+- [x] Controller LOG listing/download/cancel/progress, 32 MiB cap, duplicate/missing-chunk recovery and growing-file snapshot handling.
+- [x] Download 4,915,200 bytes from Copter SITL and parse the complete snapshot as 122,185 DataFlash records.
+- [x] Disarmed Copter reboot API/UI implemented (interoperability still unverified).
+- [ ] Board-specific firmware flashing, board/image checks, bootloader recovery and reset workflow. Deliberately unavailable, with explicit UI explanation.
+- [ ] MAVLink FTP, larger logs and firmware-specific PX4 controller-log retrieval.
+
+## 6. Broader support and usability
+
+- [x] Connect/Setup/Configure/Plan/Fly/Analyze navigation, units/current/pending values, review/apply feedback, unsupported-action explanations and mobile checks.
+- [x] 51 backend/transport tests, three general browser tests and one full browser-to-SITL test pass.
+- [x] Native Windows Copter SITL download and isolated reproducible test helpers; real ULog fixture helper.
+- [x] Verified direct Windows venv startup. `.ps1` wrapper is blocked by host execution policy; no policy change was made.
+- [ ] PX4 SITL: blocked by absent WSL/Linux/Docker runtime on this host. No PX4 flight-operation support claim.
+- [ ] Plane/Rover setup and mission-write qualification. Telemetry and generic protocols remain unverified on these families.
+- [ ] INAV/Betaflight MSP adapter and firmware semantics, as a separate milestone. Unsupported today.
+- [ ] Hardware acceptance, production-readiness work and Mission Planner-class breadth. Do not claim parity.
+
+## Delivery history
+
+The requested work is divided into ten substantive commit/push batches: audit, protocol reliability, regression tests, shared workflows, geographic UI, firmware/browser qualification, controller logs/action observations, transport/ULog fixes, Copter browser acceptance/refinement, and final evidence/documentation. No empty activity commits are used.

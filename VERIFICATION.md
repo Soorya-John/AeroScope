@@ -1,0 +1,73 @@
+# Verification record — 2026-10-31
+
+## Baseline and environment
+
+Windows, Python 3.12, pymavlink 2.4.50, pyserial 3.5. Node/npm and Microsoft Edge are present. Installed isolated venv extras include FastAPI 0.162.0, Uvicorn 0.54.0, pyulog 1.3.0 and httpx 0.28.1. Playwright 1.56.1 and Leaflet 1.9.4 are pinned by package-lock.json.
+
+Baseline: `python -m unittest discover -s backend/tests -v` ran 35 tests: 34 passed, one Windows HTTP abort. The final suite includes a regression for ignored POST bodies poisoning persistent connections.
+
+## Final checks
+
+| Command | Actual result |
+|---|---|
+| `.venv/Scripts/python.exe -m unittest discover -s backend/tests -q` | 51 passed, including optional FastAPI shared-service/route/error/export and metadata namespace/version checks |
+| `.venv/Scripts/python.exe -m compileall -q backend/app` | Passed |
+| `node --check frontend/static/app.js` and workflows.js/planner.js | Passed |
+| `git diff --check` | Passed |
+| `npm.cmd run test:browser` | Three passed: navigation/ownership/demo/offline plan, persistent/invalid drafts, mobile layout |
+| `npx.cmd playwright test -c playwright.sitl.config.js` | One passed against a separately spawned real Copter: browser connection, full download, edit/restore, mission import/upload/download/comparison/disconnect |
+| `.venv/Scripts/python.exe tools/verify_sitl.py` | All 22 recorded checks passed; details in SITL_RESULTS.json |
+| `.venv/Scripts/python.exe tools/verify_ulog.py` | Real upstream sample parsed: 8,744 selected records, 667 samples, 68.99 s; details in ULOG_RESULTS.json |
+
+General browser tests use an explicitly labeled demo and a parameter fixture only for draft-persistence testing. The separate browser-to-SITL test uses real vehicle responses with no API response mocks. Screenshots were inspected from `.tools/`; native access to the user's open Edge window was not approved by the computer-use tool. Automated headless Edge tests remained available and ran successfully.
+
+## Exact Copter SITL evidence
+
+Official `CopterStable` native Windows binary reported **ArduCopter V4.7.2**, revision **fbd0a3160c90a557c24ce4c38c16975532652536**. Packed MAVLink version is `4.7.2.255`. Vehicle quad/X; system/component 1/1. Test location is the synthetic Canberra SITL default, not a user flight location.
+
+The verifier owns its child process and uses a fresh isolated working directory and a reserved local UDP port. It does not attach to arbitrary endpoints. No physical vehicle commands were sent. Initial TCP connection/transfer tests also worked, but the native runtime exited on TCP closure; final reconnect verification uses UDP. Windows binaries, DLLs, default parameter files, raw logs and screenshots are ignored under `.tools/`.
+
+The final API → service → protocol → vehicle → observed-result run verified:
+
+1. Connection, explicit target, heartbeat, firmware and capabilities.
+2. All **1,370 parameters** downloaded.
+3. Review/staged write to `INS_GYRO_FILTER`, echo confirmation and independent readback.
+4. Restore of the original value with independent readback.
+5. Complete configuration JSON export.
+6. Gyro calibration accepted/result received.
+7. Bounded motor test: command 209 accepted, one motor, 3%, one second (SITL only).
+8. Actual unsupported command returned `UNSUPPORTED`.
+9. Mission upload accepted after item transfer.
+10. Integer mission download/round trip with coordinate tolerance, excluding the ArduPilot home slot.
+11. Mission clear and acknowledged empty download.
+12. GUIDED heartbeat after normal EKF/GPS initialization.
+13. Normal ARM ACK and observed armed heartbeat, with arming checks unchanged.
+14. Takeoff observed above 4 m for a 5 m request.
+15. COMMAND_INT guided reposition observed within the qualified position/altitude tolerances.
+16. BRAKE/pause mode observed.
+17. RTL mode observed.
+18. RTL landing and disarm observed.
+19. Flight-controller log list received.
+20. Full **4,915,200-byte** listed log snapshot downloaded. The file may continue growing; data beyond the listed snapshot is clipped rather than corrupting completion.
+21. Downloaded DataFlash parsed into **122,185 records**, 113.46 s and 639 GPS path samples.
+22. Disconnect/reconnect changes session and leaves no queued flight-command replay.
+
+A cold-start run rejected arming with `Need Position Estimate`; that rejection was surfaced. The successful run waits for normal initialization. No ARMING_CHECK change, force-arm, or automatic retry of hazardous commands was used.
+
+## Real log parsing
+
+The public pyulog fixture URL and SHA-256 are retained in ULOG_RESULTS.json. Running it found and fixed a missing relative-altitude accumulator initialization. Topics absent from that file remain unavailable, including a GPS map track. The parser now bounds selected timed records, selects primary topic instances, and limits desired-attitude matching to nearby timestamps.
+
+Controller-log analysis uses a real DataFlash log generated by the owned SITL flight. Download integrity checks require all snapshot chunks; incomplete downloads cannot be analyzed. Local diagnostics distinguish facts, missing data and possible explanations.
+
+## Startup
+
+Dependency installation succeeded in `.venv`. The host blocked direct `start_dev.ps1` execution because scripts are disabled. No policy was changed. The documented direct command `.venv/Scripts/python.exe start_dev.py` started Uvicorn on loopback port 8765 successfully. The standard-library server was also exercised by browser and HTTP integration tests.
+
+## Acceptance limits
+
+- Sensor-motion calibrations other than gyro, physical motors/output mapping, serial hardware and maintenance reboot remain unqualified.
+- Direct LAND, speed-achievement, AUTO/mission resume and full mission execution are implemented but not independently exercised in this final SITL campaign.
+- Missing/late ACK, immediate responses, stale queued work, cancellation and disconnect cases have regression/deterministic coverage. This is not a complete fault-injection campaign against actual autopilot SITL.
+- Broader firmware versions, Plane/Rover writes, PX4 SITL, fence/rally, MSP/INAV, complete metadata, receiver-capture wizard, terrain/camera surveys and board-specific flashing remain open.
+- The app is local-only and has no authentication or MAVLink signing. These results do not establish production readiness or Mission Planner parity.
