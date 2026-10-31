@@ -137,6 +137,7 @@ class _Accumulator:
         self.last_sample_t: float | None = None
         self.record_count = 0
         self.max_altitude: float | None = None
+        self.max_relative_altitude: float | None = None
         self.max_speed: float | None = None
         self.max_current: float | None = None
         self.min_voltage: float | None = None

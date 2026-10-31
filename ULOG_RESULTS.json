@@ -1,0 +1,50 @@
+{
+  "source": "https://raw.githubusercontent.com/PX4/pyulog/main/test/sample.ulg",
+  "sha256": "81952e6059bc095717e7911c010e07f85749d6b04d332a5ffc51575a3fd0a558",
+  "parser": {
+    "name": "pyulog.ULog",
+    "datasets": [
+      "actuator_controls_0",
+      "actuator_outputs",
+      "commander_state",
+      "control_state",
+      "cpuload",
+      "ekf2_innovations",
+      "estimator_status",
+      "sensor_combined",
+      "sensor_preflight",
+      "telemetry_status",
+      "vehicle_attitude",
+      "vehicle_attitude_setpoint",
+      "vehicle_local_position",
+      "vehicle_rates_setpoint",
+      "vehicle_status"
+    ],
+    "limitations": "Only selected position, attitude, battery, GPS, and status datasets are normalized."
+  },
+  "summary": {
+    "record_count": 8744,
+    "duration_s": 68.99,
+    "max_altitude_m": null,
+    "max_altitude_reference": null,
+    "max_relative_altitude_m": -0.09352193027734756,
+    "max_relative_altitude_reference": "CTUN/local position relative altitude",
+    "max_speed_m_s": null,
+    "max_speed_reference": null,
+    "max_current_a": null,
+    "min_voltage_v": null,
+    "flight_modes": [
+      "0"
+    ],
+    "data_fields": [
+      "actuator_outputs",
+      "pitch_deg",
+      "roll_deg",
+      "yaw_deg"
+    ],
+    "gps_path_points": 0,
+    "time_source": "embedded record timestamps"
+  },
+  "samples": 667,
+  "result": "PASS"
+}

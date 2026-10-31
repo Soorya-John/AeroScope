@@ -288,7 +288,9 @@ class TelemetryTests(unittest.TestCase):
         tx=manager.guided_reposition(37,-122,30,confirmation="GO",acknowledge_unknown=True)
         self.assertEqual(tx["command"],192)
         payload=manager._outbound.get_nowait()[1]
-        self.assertEqual(payload[2][4:7],(37.0,-122.0,30.0))
+        self.assertEqual(payload['kind'],'command_int')
+        self.assertEqual(payload['frame'],6)
+        self.assertEqual(payload['params'][4:7],(37.0,-122.0,30.0))
         with self.assertRaises(ValueError): manager.guided_reposition(91,0,1,confirmation="GO",acknowledge_unknown=True)
 
     def test_parameter_types_validation_and_echo_confirmation(self):

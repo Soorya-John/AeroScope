@@ -97,6 +97,16 @@ class HttpWorkflowTests(unittest.TestCase):
         payload=json.loads(err.exception.read())
         self.assertEqual(payload["code"],"operation_unavailable")
 
+    def test_post_body_is_consumed_before_next_keepalive_request(self):
+        import http.client
+        connection=http.client.HTTPConnection(self.host,self.port,timeout=4)
+        try:
+            connection.request('POST','/api/connection/disconnect','{}',{'Content-Type':'application/json','X-AeroScope-Client':'http-tests'})
+            response=connection.getresponse();self.assertEqual(response.status,200);response.read()
+            connection.request('GET','/api/state');response=connection.getresponse()
+            self.assertEqual(response.status,200);response.read()
+        finally:connection.close()
+
     def setUp(self):
         simulator.stop(); mavlink.disconnect(); vehicle_state.reset()
         mavlink.workflows.owner=None

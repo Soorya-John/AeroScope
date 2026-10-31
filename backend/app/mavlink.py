@@ -648,6 +648,7 @@ class MavlinkManager:
         vehicle=snapshot["vehicle"]; mode=snapshot["status"]["flight_mode"]; conn=snapshot["connection"]
         if vehicle.get("simulated"): raise RuntimeError("Guided operations are disabled for simulation")
         if vehicle.get("autopilot",{}).get("value")!="ArduPilot": raise RuntimeError("Operation is enabled only for identified ArduPilot")
+        if vehicle.get('type',{}).get('value') not in {'Quadrotor','Hexarotor','Octorotor','Tricopter','Coaxial','Helicopter'}:raise RuntimeError('Guided takeoff/land/speed are qualified only for ArduPilot Copter')
         if not mode.get("available") or mode.get("value")!="GUIDED": raise RuntimeError("Vehicle must report GUIDED mode")
         if conn["state"]!="connected" or conn.get("heartbeat_age_s") is None or conn["heartbeat_age_s"]>2: raise RuntimeError("A fresh heartbeat is required")
         gps=snapshot["gps"]["fix_type"]

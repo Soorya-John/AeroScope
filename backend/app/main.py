@@ -275,11 +275,14 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json(500, {"error": "Internal server error"})
 
     def do_POST(self) -> None:
+        self._parsed_body=None
         if not self._origin_ok():
             self._send_json(403, {"error": "Cross-origin request denied"})
             return
         path = urlsplit(self.path).path
         try:
+            if self.headers.get('Content-Type','').startswith('application/json'):
+                self._parsed_body=self._json_body()
             client=self.headers.get('X-AeroScope-Client')
             if path in POST_ROUTES:
                 self._send_json(200,mavlink.workflows.dispatch('POST',path,self._json_body(),client)); return
@@ -416,6 +419,7 @@ class Handler(BaseHTTPRequestHandler):
             self._send_json(404, {"error": "Route not found"})
 
     def _json_body(self) -> dict[str, Any]:
+        if getattr(self,'_parsed_body',None) is not None:return self._parsed_body
         ctype = self.headers.get("Content-Type", "")
         if not ctype.startswith("application/json"):
             raise ValueError("Content-Type must be application/json")

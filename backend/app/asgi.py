@@ -136,7 +136,11 @@ async def set_control_arm(request: Request):
 
 
 @app.get("/api/parameters")
-def get_parameters(search: str = ""): return {"protocol_version":1,**mavlink.parameters.snapshot(search)}
+def get_parameters(search: str = ""):
+    from .metadata import parameter_metadata
+    data=mavlink.parameters.snapshot(search);metadata=parameter_metadata(vehicle_state.snapshot()['vehicle'])
+    for p in data['parameters']:p['metadata']=metadata.get(p['name'],{})
+    return {'protocol_version':1,**data}
 
 
 @app.post("/api/parameters/request")
