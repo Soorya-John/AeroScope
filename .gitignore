@@ -8,3 +8,6 @@ data/
 .env
 .DS_Store
 backend/tests/.test-tmp/
+.tools/
+node_modules/
+test-results/
